@@ -11,7 +11,7 @@
 6. [PoC deployment steps](#PoC-Guidance-deployment-Steps)
 7. [Deployment validation](#Deployment-Validation)
 8. [Running the Guidance and PoC testing](#Running-the-Guidance-and-PoC-testing)
-9. [Next Steps & testing for different scenarios](#Next-Steps-&-testing-for-different-scenarios)
+9. [Next Steps and testing for different scenarios](#Next-Steps-and-testing-for-different-scenarios)
 10. [Cleanup](#cleanup)
 
 <br/><br/>
@@ -250,14 +250,14 @@ aws iam simulate-principal-policy --policy-source-arn $MYARN --action-names "s3:
 
 To get started with this PoC Guidance, use AWS CloudFormation to deploy one of the below YAML templates based on your required FSx for Lustre deployment type (i.e. Persistent-SSD or Scratch), and whether you require a standalone FSx file system, or an S3-linked FSx file system.
 
-| FSx deployment type  | CloudFormation template |
-| ----------- | ------------ |
-| Persistent-SSD: Standalone FSx for Lustre file system  |  Persistent2_standalone_fs.yaml |
-| Persistent-SSD: S3-Linked FSx for Lustre file system | Persistent2_s3_linked_fs.yaml |
-| Scratch: Standalone FSx for Lustre file system  | scratch2_standalone_fs.yaml |
-| Scratch: S3-Linked FSx for Lustre file system | scratch2_s3_linked_fs.yaml |
+| FSx deployment type  | CloudFormation template name | Click to deploy |
+| ----------- | ------------ | ------------ |
+| Persistent-SSD: Standalone FSx for Lustre file system  |  [Persistent2_standalone_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/persistent_standalone_fs.yaml) | **[LAUNCH](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?templateURL=https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/persistent_standalone_fs.yaml)**
+| Persistent-SSD: S3-Linked FSx for Lustre file system | [Persistent2_s3_linked_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/persistent_s3_linked_fs.yaml) | **[LAUNCH](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?templateURL=https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/persistent_s3_linked_fs.yaml)**
+| Scratch: Standalone FSx for Lustre file system  | [scratch2_standalone_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/scratch2_standalone_fs.yaml) | **[LAUNCH](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?templateURL=https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/scratch2_standalone_fs.yaml)**
+| Scratch: S3-Linked FSx for Lustre file system | [scratch2_s3_linked_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/scratch2_s3_linked_fs.yaml) | **[LAUNCH](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?templateURL=https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/scratch2_s3_linked_fs.yaml)**
 
-Refer to the output tab of the deployed AWS CloudFormation stack, which will provide details of the AWS resources created and their ID's.
+Refer to the **output** tab of the deployed AWS CloudFormation stack, which will provide details of the AWS resources created and their ID's.
 
 Each of the sample AWS CloudFormation YAML templates provided in this Guidance will deploy the following:
 
@@ -504,7 +504,7 @@ Perform the below actions to test the FSx for Lustre & S3 automatic import/expor
 
 <br/><br/>
 
-## Next Steps & testing for different scenarios
+## Next Steps and testing for different scenarios
 
 As part of a PoC, you may want to validate different workload scenarios, or even a different workload on FSx for Lustre, by testing with different parameters/configurations in your PoC. Below are a few examples of different scenarios you could test for in your PoC VPC environment (if requierd).
 
