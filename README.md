@@ -438,7 +438,7 @@ You can use your own values for the fio parameters, based on your actual workloa
 5. View the performance results using your own application tooling. You can also use the **[Amazon FSx console and it's integrated Amazon CloudWatch performance metrics dashboard to view the performance details](https://docs.aws.amazon.com/fsx/latest/LustreGuide/monitoring-cloudwatch.html)** (i.e. results of the fio tests conducted).
 
 
-<img src="assets/images/cloudwatch.JPG" width="716" height="426" />
+<img src="assets/images/cw.JPG" width="716" height="426" />
 
 6. Compare the observed PoC performance metrics with your expected requirements, and enter your test results into the key success criteria matrix for each scenario that you run.
 
