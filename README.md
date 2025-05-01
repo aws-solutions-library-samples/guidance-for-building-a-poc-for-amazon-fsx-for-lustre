@@ -14,6 +14,7 @@
 9. [Next Steps - Further PoC testing for different scenarios](#Next-Steps-Further-PoC-testing-for-different-scenarios)
 10. [Cleanup](#cleanup-required)
 
+<br/><br/>
 
 ## Overview
 
@@ -26,7 +27,9 @@ Amazon FSx for Lustre is a fully managed file system that is optimized for high-
 
 Amazon FSx eliminates the traditional complexity of setting up and managing high-performance Lustre file systems, allowing you to spin up, run, and scale a high-performance file system that provides sub-millisecond access to data stored in the Lustre file system, in minutes. FSx for Lustre also provides multiple deployment options for cost optimization. Amazon FSx for Lustre also integrates with Amazon S3, making it easy to process cloud data sets with the Lustre high-performance file system. When linked to an S3 bucket, an FSx for Lustre file system transparently presents S3 objects as files and can automatically update the contents of the linked S3 bucket as files are added to, changed in, or deleted from the file system.
 
-<img src="images/architecture.JPG">
+<img src="assets/images/architecture.JPG" width="600" height="350" />
+
+<br/><br/>
 
 ### Cost
 
@@ -38,7 +41,7 @@ You are responsible for the cost of the AWS services used while running this Gui
 
 _We recommend creating a [Budget](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html) through [AWS Cost Explorer](https://aws.amazon.com/aws-cost-management/aws-cost-explorer/) to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance._
 
-### Sample Cost Table ( required )
+### Sample Cost Table
 
 As an example, if you deploy the default EC2 instance type deployed by this Guidance (**c6in.8xlarge**), and also deploy an **9600GiB** FSx for Lustre SCRATCH-SSD based file system (which provides **1920 MB/s Throughput Capacity**) in the US-East (N. Virginia) region, as of April 2025 the cost is approximately **$2,670.08 USD per-month** while you are running this PoC guidance. The cost breakdown is provided as below, where you values will differ based on the size and type of the FSx file system and EC2 instance(s) you deploy.
 
@@ -47,6 +50,7 @@ As an example, if you deploy the default EC2 instance type deployed by this Guid
 | Amazon FSx for Lustre  | $0.140 per GB-month for a SCRATCH-SSD instance type | 9600GiB  | $ 1,345.54 per-month |
 | Amazon EC2 | $1.8144 on-demand per-hour for c6in.8xlarge instance type | Single c6in.8xlarge instance | $ 1,324.51 per-month |
 
+<br/><br/>
 
 ## Methodology for conducting a PoC
 
@@ -73,6 +77,8 @@ Create a key success criteria matrix for your PoC that includes output items suc
 - Test again as required by tuning your application, FSx for Lustre instance or EC2 Instance type.
 
 - Tear-down your PoC environment as required.
+
+<br/><br/>
 
 ## Example of a PoC key success criteria matrix
 
@@ -116,6 +122,7 @@ Below is an example PoC key success criteria table that you can populate when yo
 | Test automatic metadata import from Amazon S3 into FSx for Lustre file system |  |
 | Test automatic export of data to Amazon S3 from FSx for Lustre file system |  |
 
+<br/><br/>
 
 ## FSx for Lustre configuration guidance
 
@@ -195,7 +202,7 @@ If your application requires high levels of network throughput (for example over
 
 For EFA configuration, ensure the Lustre client software on your EC2 instances is configured to leverage the EFA network interface, and that it is **[configured optimally](https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html)**. This typically involves setting the appropriate Lustre mount options, such as **osd_timeout , rmtclient_timeout** and **max_read_ahead_mb.**
 
-
+<br/><br/>
 
 ## Prerequisites
 
@@ -235,6 +242,7 @@ aws iam simulate-principal-policy --policy-source-arn $MYARN --action-names "s3:
 - Amazon S3 bucket
 - AWS IAM role
 
+<br/><br/>
 
 ## PoC Guidance deployment Steps
 
@@ -292,6 +300,7 @@ $ sudo dnf install -y lustre-client
 Review the Post deployment performance tips section below, before copying data to your FSx instance
 
 
+<br/><br/>
 
 ## Deployment Validation
 
@@ -299,6 +308,7 @@ You can validate a successful deployment by:
 
 * Navigate to the [**AWS CloudFormation console](https://console.aws.amazon.com/cloudformation)** and verify that the status of the CloudFormation stack that you deployed is showing **CREATE_COMPLETE**.
 
+<br/><br/>
 
 ## Running the Guidance and PoC testing
 
@@ -492,6 +502,7 @@ Perform the below actions to test the FSx for Lustre & S3 automatic import/expor
 - Perform a list operation ```ls -ltr```  on the directory to get the latest list of file metadata
 - Verify that you can see the new file names in your directory (i.e. /fsx), for the new data you uploaded into S3 in the previous step.
 
+<br/><br/>
 
 ## Next Steps - PoC testing for different scenarios
 
@@ -503,6 +514,8 @@ Additionally, you may want to validate different workload scenarios, by testing 
 - Number of concurrent client nodes accessing the FSx file system
 - Different datasets, or files of different sizes
 
+<br/><br/>
+
 ## Cleanup
 
 Before deleting the deployed CloudFormation stack, you need to manually delete any new AWS resources you have manually created in the PoC VPC after deployment (i.e. additional EC2 compute instances, or new/updated IAM roles), and delte any data your have uploaded to the auto-created S3 bucket.
@@ -512,6 +525,8 @@ To delete the PoC Guidance:
 - Navigate to the **[AWS CloudFormation console](https://console.aws.amazon.com/cloudformation)**
 - Select the Cloudformation stack that you deployed as part of this Guidance, then select **Delete**
   - **Note:** AWS resources deployed by the PoC guidance CloudFormation template will be tagged with the name of the CloudFormation stack name you provided during deployment. (i.e. ```aws:cloudformation:stack-name: <your-stack-name>```)
+
+<br/><br/>
 
 ## Notices
 
