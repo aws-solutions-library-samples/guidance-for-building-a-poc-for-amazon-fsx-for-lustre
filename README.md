@@ -1,208 +1,521 @@
-# Guidance Title (required)
-
-The Guidance title should be consistent with the title established first in Alchemy.
-
-**Example:** *Guidance for Product Substitutions on AWS*
-
-This title correlates exactly to the Guidance it’s linked to, including its corresponding sample code repository. 
+# Guidance for deploying a PoC using Amazon FSx for Lustre
 
 
-## Table of Contents (required)
-
-List the top-level sections of the README template, along with a hyperlink to the specific section.
-
-### Required
+## Table of Contents
 
 1. [Overview](#overview-required)
-    - [Cost](#cost)
-2. [Prerequisites](#prerequisites-required)
-    - [Operating System](#operating-system-required)
-3. [Deployment Steps](#deployment-steps-required)
-4. [Deployment Validation](#deployment-validation-required)
-5. [Running the Guidance](#running-the-guidance-required)
-6. [Next Steps](#next-steps-required)
-7. [Cleanup](#cleanup-required)
+2. [Methodology for conducting a PoC](#Methodology-for-conducting-a-Proof-of_Concept)
+3. [Example of a PoC key success criteria matrix](#Example-of-a-PoC-key-success-criteria-matrix)
+4. [FSx for Lustre configuration guidance](#Deployment-Guidance)
+5. [Prerequisites](#prerequisites-required)
+6. [PoC deployment steps](#deployment-steps-required)
+7. [Deployment validation](#deployment-validation-required)
+8. [Running the Guidance and PoC testing](#running-the-guidance-required)
+9. [Next Steps - Further PoC testing for different scenarios](#Next-Steps-Further-PoC-testing-for-different-scenarios)
+10. [Cleanup](#cleanup-required)
 
-***Optional***
 
-8. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations-optional)
-9. [Revisions](#revisions-optional)
-10. [Notices](#notices-optional)
-11. [Authors](#authors-optional)
+## Overview
 
-## Overview (required)
+**Proof-of-Concept (PoC)** deployments that are not sized or configured correctly to reflect your workload requirements, along with undefined key success criteria, can lead to non-optimal PoC outcomes, and increased technology evaluation cycles.
 
-1. Provide a brief overview explaining the what, why, or how of your Guidance. You can answer any one of the following to help you write this:
+This Guidance provides a **self-service proof-of-concept (PoC) guide**, which encompasses an example AWS CloudFormation deployment template, and configuration guidance related to deploying and configuring Amazon FSx for Lustre for Proof-of-Concept testing. The objective of this guide is to enable more informed deployment configurations of FSx for Lustre during PoC exercises. By using the PoC configuration guidance and example PoC CloudFormation environment deployment template, you can quickly setup, configure, and test a high performance FSx for Lustre file system, and evaluate its suitability for your workload, across performance, scale, integration and functional testing. You can test the deployed FSx for Lustre file system with your own applications/tools, or with the example tools we have provided.
 
-    - **Why did you build this Guidance?**
-    - **What problem does this Guidance solve?**
 
-2. Include the architecture diagram image, as well as the steps explaining the high-level overview and flow of the architecture. 
-    - To add a screenshot, create an ‘assets/images’ folder in your repository and upload your screenshot to it. Then, using the relative file path, add it to your README. 
+Amazon FSx for Lustre is a fully managed file system that is optimized for high-performance workloads. It provides a native Lustre file system experience, with the scalability, performance, and availability that customers expect from the Lustre file system, combined with the simplicity, cost-effectiveness, and security of a fully managed service.
 
-### Cost ( required )
+Amazon FSx eliminates the traditional complexity of setting up and managing high-performance Lustre file systems, allowing you to spin up, run, and scale a high-performance file system that provides sub-millisecond access to data stored in the Lustre file system, in minutes. FSx for Lustre also provides multiple deployment options for cost optimization. Amazon FSx for Lustre also integrates with Amazon S3, making it easy to process cloud data sets with the Lustre high-performance file system. When linked to an S3 bucket, an FSx for Lustre file system transparently presents S3 objects as files and can automatically update the contents of the linked S3 bucket as files are added to, changed in, or deleted from the file system.
 
-This section is for a high-level cost estimate. Think of a likely straightforward scenario with reasonable assumptions based on the problem the Guidance is trying to solve. Provide an in-depth cost breakdown table in this section below ( you should use AWS Pricing Calculator to generate cost breakdown ).
 
-Start this section with the following boilerplate text:
+2. Include the architecture diagram image, as well as the steps explaining the high-level overview and flow of the architecture.
+    - To add a screenshot, create an ‘assets/images’ folder in your repository and upload your screenshot to it. Then, using the relative file path, add it to your README.
 
-_You are responsible for the cost of the AWS services used while running this Guidance. As of <month> <year>, the cost for running this Guidance with the default settings in the <Default AWS Region (Most likely will be US East (N. Virginia)) > is approximately $<n.nn> per month for processing ( <nnnnn> records )._
+### Cost
 
-Replace this amount with the approximate cost for running your Guidance in the default Region. This estimate should be per month and for processing/serving resonable number of requests/entities.
+You are responsible for the cost of the AWS services used while running this Guidance. The cost for running this Guidance is based on your deployment values for the following AWS resources:
+* **Amazon EC2** - This Guidance by default will deploy a single c6in.8xlarge EC2 instance. This EC2 instance type provides 50Gbps of dedicated network throughput capability (vs burst network bandwith), along with 32vCPU & 64GB RAM. Post Guidance deployment, you can change the EC2 Instance type as required, and deploy more EC2 instances as required by your testing.
+* **Amazon FSx for Lustre** - You have the option to deploy a SCRATCH-SSD or PERSISTENT-SSD based file system, each of which have different associated pricing. [Refer to Amazon FSx for Lustre pricing details](https://aws.amazon.com/fsx/lustre/pricing/)
+* **Amazon S3** - Any data that your store, and access in the S3 bucket that this is provisioned for S3-Linked FSx for Lustre file system deployments as per of this Guidance. By default no data is stored in the provisioned S3 bucket.
 
-Suggest you keep this boilerplate text:
+
 _We recommend creating a [Budget](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html) through [AWS Cost Explorer](https://aws.amazon.com/aws-cost-management/aws-cost-explorer/) to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance._
 
 ### Sample Cost Table ( required )
 
-**Note : Once you have created a sample cost table using AWS Pricing Calculator, copy the cost breakdown to below table and upload a PDF of the cost estimation on BuilderSpace. Do not add the link to the pricing calculator in the ReadMe.**
+As an example, if you deploy the default EC2 instance type deployed by this Guidance (**c6in.8xlarge**), and also deploy an **9600GiB** FSx for Lustre SCRATCH-SSD based file system (which provides **1920 MB/s Throughput Capacity**) in the US-East (N. Virginia) region, as of April 2025 the cost is approximately **$2,670.08 USD per-month** while you are running this PoC guidance. The cost breakdown is provided as below, where you values will differ based on the size and type of the FSx file system and EC2 instance(s) you deploy.
 
-The following table provides a sample cost breakdown for deploying this Guidance with the default parameters in the US East (N. Virginia) Region for one month.
+| AWS service  | Dimensions | Example sizing |  Example cost [USD]  |
+| ----------- | ------------ | ------------ | ------------  |
+| Amazon FSx for Lustre  | $0.140 per GB-month for a SCRATCH-SSD instance type | 9600GiB  | $ 1,345.54 per-month |
+| Amazon EC2 | $1.8144 on-demand per-hour for c6in.8xlarge instance type | Single c6in.8xlarge instance | $ 1,324.51 per-month |
 
-| AWS service  | Dimensions | Cost [USD] |
-| ----------- | ------------ | ------------ |
-| Amazon API Gateway | 1,000,000 REST API calls per month  | $ 3.50month |
-| Amazon Cognito | 1,000 active users per month without advanced security feature | $ 0.00 |
 
-## Prerequisites (required)
+## Methodology for conducting a PoC
 
-### Operating System (required)
+- Define your workload requirements, the desired PoC outcomes
+Create a key success criteria matrix for your PoC that includes output items such as:
+- Performance (i.e. IOPS, throughput, latency, application specific metrics).
 
-- Talk about the base Operating System (OS) and environment that can be used to run or deploy this Guidance, such as *Mac, Linux, or Windows*. Include all installable packages or modules required for the deployment. 
-- By default, assume Amazon Linux 2/Amazon Linux 2023 AMI as the base environment. All packages that are not available by default in AMI must be listed out.  Include the specific version number of the package or module.
+  **Note**: When looking to measure performance, it's important to understand factors such as, the read-to-write ratio & IO profile of your workload, file size distribution, the number of clients that will concurrently accessing the FSx for Lustre File system, and also the Amazon EC2 instance type capabilities (CPU/memory/network), that you will use to host your application.
 
-**Example:**
-“These deployment instructions are optimized to best work on **<Amazon Linux 2 AMI>**.  Deployment in another OS may require additional steps.”
+- Integration, data access, monitoring, and any specific application requirements
 
-- Include install commands for packages, if applicable.
+- Identify and obtain the tools/applications that you will use to perform your testing
 
+- Characterize and create any required datasets that will be used for testing
 
-### Third-party tools (If applicable)
+- Identify and obtain the required AWS privileges for deployment of your PoC components in AWS. Refer to prerequisites for further information
 
-*List any installable third-party tools required for deployment.*
+- Deploy your PoC environment when you have the above items ticked off.
 
+- Tune the FSx Lustre File system based on your data profile
 
-### AWS account requirements (If applicable)
+- Evaluate the elements defined in your PoC key success criteria matrix through testing in the PoC environment
 
-*List out pre-requisites required on the AWS account if applicable, this includes enabling AWS regions, requiring ACM certificate.*
+- Test again as required by tuning your application, FSx for Lustre instance or EC2 Instance type.
 
-**Example:** “This deployment requires you have public ACM certificate available in your AWS account”
+- Tear-down your PoC environment as required.
 
-**Example resources:**
-- ACM certificate 
-- DNS record
-- S3 bucket
-- VPC
-- IAM role with specific permissions
-- Enabling a Region or service etc.
+## Example of a PoC key success criteria matrix
 
+Below is an example PoC key success criteria table that you can populate when you run your different PoC configuration and test scenarios. Prior to conducting a PoC, it's important to take note of your **workload configuration**, below are some of the suggested items to obtain value for. As you navigate through this document you will obtain guidance to help you update the Amazon FSx for Lustre configuration section.
 
-### aws cdk bootstrap (if sample code has aws-cdk)
+### Scenario 1:
 
-<If using aws-cdk, include steps for account bootstrap for new cdk users.>
+| Item | PoC Value |
+|------|-----------|
+| **Workload configuration** |
+| Amazon EC2 compute instance type to be used by workload |  |
+| Network throughput capability of Amazon EC2 instance selected |  |
+| Number of concurrent compute nodes, or threads used for testing |  |
+| Workload data set size |  |
+| Average file size or size distribution |  |
+| Data read/write access ratio |  |
+| Data sequential/random access ratio |  |
 
-**Example blurb:** “This Guidance uses aws-cdk. If you are using aws-cdk for first time, please perform the below bootstrapping....”
+| Item | PoC Value |
+|------|-----------|
+| **Amazon FSx for Lustre configuration** |
+| Storage type deployed |  |
+| Provisioned Storage capacity |  |
+| Provisioned Throughput per-unit of storage (per-TiB) |  |
+| Metadata IOPS provisioned (auto or provisioned) |  |
+| Compression enabled (Y/N) |  |
+| S3-Linked FSx file system (Y/N) |  |
 
-### Service limits  (if applicable)
+| Items for performance testing | Target value | PoC value |
+|------------------------------|--------------|-----------|
+| Latency (ms) |  |  |
+| Throughput (MB/s) |  |  |
+| IOPS |  |  |
+| Application specific performance metric(s) |  |  |
+| Workload job duration time (short vs long jobs) |  |  |
 
-<Talk about any critical service limits that affect the regular functioning of the Guidance. If the Guidance requires service limit increase, include the service name, limit name and link to the service quotas page.>
+| Functional testing | Outcome |
+|-------------------|---------|
+| Scale Throughput per-unit of storage capacity (up or down) |  |
+| Scale up storage capacity |  |
+| Test automatic metadata import from Amazon S3 into FSx for Lustre file system |  |
+| Test automatic export of data to Amazon S3 from FSx for Lustre file system |  |
 
-### Supported Regions (if applicable)
 
-<If the Guidance is built for specific AWS Regions, or if the services used in the Guidance do not support all Regions, please specify the Region this Guidance is best suited for>
+## FSx for Lustre configuration guidance
 
+You can deploy an FSx for Lustre file system in two configurations:
+1. A standalone FSx for Lustre file system:
+2. An FSx for Lustre file system that is linked to an S3 data repository (S3 bucket)
 
-## Deployment Steps (required)
+Use an S3-linked FSx for Lustre file systems for scenarios where you need to access large datasets stored in an S3 Bucket for use-cases such as, Machine Learning and training, HPC simulations, and big data analytics.
 
-Deployment steps must be numbered, comprehensive, and usable to customers at any level of AWS expertise. The steps must include the precise commands to run, and describe the action it performs.
+#### Storage deployment type:
 
-* All steps must be numbered.
-* If the step requires manual actions from the AWS console, include a screenshot if possible.
-* The steps must start with the following command to clone the repo. ```git clone xxxxxxx```
-* If applicable, provide instructions to create the Python virtual environment, and installing the packages using ```requirement.txt```.
-* If applicable, provide instructions to capture the deployed resource ARN or ID using the CLI command (recommended), or console action.
+Choose between either a Persistent-SSD, Scratch-SSD, or Persistent-HDD Storage deployment type. For this PoC guide, we are going to focus on Persistent-SSD & Scratch-SSD storage deployment types.
 
- 
-**Example:**
+Persistent-SSD deployment is recommended for mission-critical, long-running workloads that require the highest level of availability, for example HPC simulations, big data analytics or Machine Learning training.
 
-1. Clone the repo using command ```git clone xxxxxxxxxx```
-2. cd to the repo folder ```cd <repo-name>```
-3. Install packages in requirements using command ```pip install requirement.txt```
-4. Edit content of **file-name** and replace **s3-bucket** with the bucket name in your account.
-5. Run this command to deploy the stack ```cdk deploy``` 
-6. Capture the domain name created by running this CLI command ```aws apigateway ............```
+Scratch-SSD deployments are suitable for workloads that are ephemeral or short-lived.
 
+#### Storage capacity:
 
+The minimum storage capacity you can provision is 1.2TB. Any capacity required above 1.2TB needs to be provisioned in increments of 2.4TB (2.4, 4.8, 7.2, etc.). The throughput of an FSx for Lustre file system scales linearly with storage capacity, where the storage capacity of a filesystem can be increased dynamically after the filesystem's initial deployment. The provisioned storage capacity not only provides the amount of storage space your data can utilize, it also influences performance of the file system. FSx for Lustre stores data within  **[Object Storage Targets (OST's)](https://docs.aws.amazon.com/fsx/latest/LustreGuide/performance.html#storage-layout)**, where the amount of provisioned storage capacity determines the number of OSTs provisioned for your Lustre file system. The number of OSTs your Lustre file has provisioned dictates the maximum Lustre stripe count available to strip your large files across the backend OSTs.
 
-## Deployment Validation  (required)
+#### Throughput per unit of storage:
 
-<Provide steps to validate a successful deployment, such as terminal output, verifying that the resource is created, status of the CloudFormation template, etc.>
+Throughput for the entire filesystem is calculated based on the amount of provisioned storage (in TiB), multiplied by the throughput-per-unit of storage configured (in MB/s). The throughput-per-unit of storage value can be modified dynamically (once every 6 hours) after the filesystem is deployed. Scratch file system have a fixed throughput unit of 200MB/s per-TiB.
 
+Example: If your application required 4TiB of persistent storage capacity and requires 2,000MB/s of aggregate throughput, then:
 
-**Examples:**
+- You could provision a FSx for Lustre file system with 4.8TiB of Persistent-SSD storage capacity, with 500MB/s of throughput per-TiB. This will provide 2400MB/s of **[aggregate baseline disk throughput capability](https://docs.aws.amazon.com/fsx/latest/LustreGuide/performance.html#fsx-aggregate-perf)** (4.8TiB * 500MB/s = 2400MB/s).
 
-* Open CloudFormation console and verify the status of the template with the name starting with xxxxxx.
-* If deployment is successful, you should see an active database instance with the name starting with <xxxxx> in        the RDS console.
-*  Run the following CLI command to validate the deployment: ```aws cloudformation describe xxxxxxxxxxxxx```
+- Alternatively, you could provision 9.6TiB of Persistent-SSD storage capacity, with 250MB/s per-TiB throughput to achieve the same 2400MB/s of aggregate baseline disk throughput capability (9.6TiB * 250MB/s = 2400MB/s).
 
+- This second configuration will provide more storage capacity and more backend OST nodes, which could provide increased performance (based on your file size and stripe count configuration)
 
+**Note**: Use the **[AWS pricing calculator](https://calculator.aws/#/estimate)** to model the cost of different FSx storage& throughput capacity options available for your specific requirements (such as above).
 
-## Running the Guidance (required)
+#### Metadata Configuration:
 
-<Provide instructions to run the Guidance with the sample data or input provided, and interpret the output received.> 
+Metadata IO operations (such as, open, close, get attributes, set attributes, lock, unlock, etc.) will represent a greater portion of overall operations when a filesystem is composed of very small files (<16KB), and there are many file operations on very small files vs large files. For most applications, the default Metadata configuration of FSx for Lustre will provide sufficient metadata IOPS. If your workload is comprised of lots of small KB sized files, **[monitor the Metadata performance IOPS metrics within the FSx for Lustre console's Monitoring & Performance dashboard](https://docs.aws.amazon.com/fsx/latest/LustreGuide/monitoring-cloudwatch.html)**. Update the Metadata IOPS performance dynamically as required.
 
-This section should include:
+#### Data compression:
 
-* Guidance inputs
-* Commands to run
-* Expected output (provide screenshot if possible)
-* Output description
+Enable data compression if you have file types that can be compressed. This can help to increase performance as data compression reduces the amount of data that is transferred between FSx for Lustre file servers and storage. FSx for Lustre automatically compresses newly-written files using the LZ4 algorithm before they are written to disk and automatically uncompresses them when they are read. Enabling data compression does not typically have a measurable impact on latency. You can enable or disable data compression on an existing FSx for Lustre file system.
 
+#### Data Repository Association
 
+You can link your FSx for Lustre file system to an S3 bucket using a **[Data Repository Association](https://docs.aws.amazon.com/fsx/latest/LustreGuide/fsx-data-repositories.html)**, which will allow automatic import/export of data from/to Amazon S3. You can utilize FSx for Lustre as a high-performance cache for data stored in an S3 bucket. When your FSx file system is created, the names and prefixes of objects in your S3 bucket will appear as files and directory listings on the file system. The actual content of a given object is imported automatically from Amazon S3 when you access the associated file on the FSx for Lustre file system for the first time. Subsequent access to the file will be served directly from the Lustre file system.
 
-## Next Steps (required)
+#### Dynamic scaling of storage capacity and performance
 
-Provide suggestions and recommendations about how customers can modify the parameters and the components of the Guidance to further enhance it according to their requirements.
+Once you have deployed an FSx for Lustre file system, you can dynamically adjust the following:
 
+- Increase Storage capacity for Scratch and Persistent-SSD based FSx for Lustre file system when additional storage capacity, or additional throughput and disk performance is required.  When you increase the file system capacity, Amazon FSx automatically adds new network file servers and scales your metadata servers.
 
-## Cleanup (required)
+**Note**: You can only update storage capacity 6 hours after a previous storage capacity updated has completed
 
-- Include detailed instructions, commands, and console actions to delete the deployed Guidance.
-- If the Guidance requires manual deletion of resources, such as the content of an S3 bucket, please specify.
+When scaling storage capacity, the file system may become unavailable for a few minutes for the update to complete.
 
+- Update Throughput per-unit of storage (throughput capacity) for Persistent-SSD based FSx for Lustre file systems, where you can increase/decrease the Throughput per-unit of storage once every 6 hours. You may want to increase the throughput capacity in certain scenarios, such as:
 
+When you require more baseline throughput capacity performance and not additional storage capacity, or when you're your workload requires extra throughput capacity performance for a period of time (i.e. end of month batch processing). You can then decrease the throughput capacity value when you don't need that extra performance.
 
-## FAQ, known issues, additional considerations, and limitations (optional)
+**Note**: When you modify your file system's throughput capacity, behind the scenes, Amazon FSx switches out the file system's file servers. Your file system will be unavailable for a few minutes during throughput capacity scaling
 
+- Update Metadata IOPS value for Persistent-SSD based FSx for Lustre file systems, where you can select to update between Automatic or User-provisioned Metadata IOPS values.
 
-**Known issues (optional)**
+**Note**: While updating metadata IOPS, the file system may be unavailable for a few minutes. File operations issued by clients while the file system is unavailable will transparently retry and eventually succeed after scaling is complete.
 
-<If there are common known issues, or errors that can occur during the Guidance deployment, describe the issue and resolution steps here>
+#### Amazon EC2 compute instance guidance
 
+When launching Amazon EC2 instances for your compute-intensive workload, choose instance types that have the GPU/CPU, memory, and network performance that your application requires. Selecting the appropriate EC2 compute instance(s) for your application, will enable you to better leverage the performance capabilities of the FSx for Lustre file system.  When selecting the EC2 Instances for your application, take note of the **[baseline Gbps network bandwidth per EC2 instance type](https://docs.aws.amazon.com/ec2/latest/instancetypes/co.html#co_network)**, and select instances that are network optimized and have dedicated baseline network throughput vs burst for network throughput.
 
-**Additional considerations (if applicable)**
+If you are using Amazon EC2 instances with more than 64GiB of memory or 64 vCPU, **[then apply these performance tips](https://docs.aws.amazon.com/fsx/latest/LustreGuide/performance.html#performance-tips)**.
 
-<Include considerations the customer must know while using the Guidance, such as anti-patterns, or billing considerations.>
+#### Elastic Fabric Adapter (EFA):
 
-**Examples:**
+If your application requires high levels of network throughput (for example over 30Gbps per compute node), then you can look at using at using EC2 Instances that support the Elastic Fabric Adapter (EFA). EFA is a network interface that provides low-latency, high-throughput communication for distributed applications running on Amazon EC2 instances. If you are selecting an EC2 instance for your workload that supports EFA, it's highly recommended to enable EFA on that EC2 instance, as EFA reduces network latency and increases network bandwidth for FSx for Lustre file system access. **[Refer to this link for EC2 instance types that support EFA](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa.html#efa-instance-types)**.
 
-- “This Guidance creates a public AWS bucket required for the use-case.”
-- “This Guidance created an Amazon SageMaker notebook that is billed per hour irrespective of usage.”
-- “This Guidance creates unauthenticated public API endpoints.”
+For EFA configuration, ensure the Lustre client software on your EC2 instances is configured to leverage the EFA network interface, and that it is **[configured optimally](https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html)**. This typically involves setting the appropriate Lustre mount options, such as **osd_timeout , rmtclient_timeout** and **max_read_ahead_mb.**
 
 
-Provide a link to the *GitHub issues page* for users to provide feedback.
 
+## Prerequisites
 
-**Example:** *“For any feedback, questions, or suggestions, please use the issues tab under this repo.”*
+- Identify any test data that will be required for use in the PoC (or that will be created in PoC environment).
+- Take note that each FSx for Lustre file system requires the following:
+  - A VPC Security group with [inbound/outbound port rules](https://docs.aws.amazon.com/fsx/latest/LustreGuide/limit-access-security-groups.html#fsx-vpc-security-groups). The PoC CloudFormation template that you will deploy will create/configure a VPC Security group to allow access to the FSx instance from the deployed Amazon EC2 host.
+  - One IP address for each metadata server (MDS) and one IP address for each storage server (OSS). In the CloudFormation deployment template that is provided, you an specify your CIDR value.
+- **[Refer to the full list of prerequisites here](https://docs.aws.amazon.com/fsx/latest/LustreGuide/getting-started.html)**
 
-## Revisions (optional)
+### Operating System
 
-Document all notable changes to this project.
+- All installable packages/modules are deployed as part of the PoC guidance CloudFormation template.
+- The Amazon Linux 2023 AMI has been used as the base OS for the deployed EC2 instance.
 
-Consider formatting this section based on Keep a Changelog, and adhering to Semantic Versioning.
 
-## Notices (optional)
+### AWS account requirements
+
+- Access to the AWS Console or AWS CLI, with the required IAM privileges to deploy the AWS CloudFormation deployment templates, and create/manage AWS resources. You can run the below example commands to verify if your role has the access required access to create AWS resources required for the PoC guidance deployment [Amazon EC2, Amazon S3, Amazon FSx, AWS CloudFormation, AWS IAM]
+
+```bash
+# Get my user's identity
+MYARN="$(aws sts get-caller-identity --query Arn | tr -d '"')"
+
+# Below are examples of how you can check if you have the required permissions to create an FSx instance, EC2 instance, S3 bucket and a VPC Security Group
+
+aws iam simulate-principal-policy --policy-source-arn $MYARN --action-names "fsx:CreateFileSystem" | grep -i decision
+aws iam simulate-principal-policy --policy-source-arn $MYARN --action-names "ec2:CreateSecurityGroup" | grep -i decision
+aws iam simulate-principal-policy --policy-source-arn $MYARN --action-names "ec2:CreateInstance" | grep -i decision
+aws iam simulate-principal-policy --policy-source-arn $MYARN --action-names "s3:CreateBucket" | grep -i decision
+
+```
+
+**Resources deployed as per this guidance:**
+- Amazon VPC & Internet Gateway
+- Amazon EC2
+- Amazon FSx for Lustre
+- Amazon S3 bucket
+- AWS IAM role
+
+
+## PoC Guidance deployment Steps
+
+#### Deploying a FSx for Lustre file system in a new PoC VPC environment using CloudFormation
+
+To get started with this PoC Guidance, use AWS CloudFormation to deploy one of the below YAML templates based on your required FSx for Lustre deployment type (i.e. Persistent-SSD or Scratch), and whether you require a standalone FSx file system, or an S3-linked FSx file system.
+
+| FSx deployment type  | CloudFormation template |
+| ----------- | ------------ |
+| Persistent-SSD: Standalone FSx for Lustre file system  |  Persistent2_standalone_fs.yaml |
+| Persistent-SSD: S3-Linked FSx for Lustre file system | Persistent2_s3_linked_fs.yaml |
+| Scratch: Standalone FSx for Lustre file system  | scratch2_standalone_fs.yaml |
+| Scratch: S3-Linked FSx for Lustre file system | scratch2_s3_linked_fs.yaml |
+
+Refer to the output tab of the deployed AWS CloudFormation stack, which will provide details of the AWS resources created and their ID's.
+
+Each of the sample AWS CloudFormation YAML templates provided in this Guidance will deploy the following:
+
+- A new Amazon VPC with a private subnet, a public subnet and Internet Gateway.
+- A single Amazon EC2 instance with Amazon Linux 2023 is deployed in the private subnet, providing you with a default compute node you can use to test with, and which has access to the deployed PoC VPC resources. The deployed compute node is configured with the **[Amazon Systems Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/what-is-systems-manager.html)**, providing an easy way to access a CLI session on the compute node.
+
+  - **Note**: By default, a **[c6in.8xlarge EC2 instance](https://aws.amazon.com/ec2/instance-types/c6i/)** is deployed by these example CloudFormation templates as an initial compute testing node. It is highly recommended to update this EC2 Instance type to the type required by your workload, and/or deploy the appropriate number of EC2 instances as required by you workload for any distributed testing scenarios. **[Click here for more information](\https:\docs.aws.amazon.com\ec2\latest\instancetypes\co.html#co_network)** on baseline network performance and EFA capability per EC2 instance type.
+
+- An Amazon FSx for Lustre instance in the private subnet
+- An Amazon S3 bucket (if you selected to deploy a S3-linked FSx for Lustre file system)
+
+**Note**: After you have deployed the guidance and it has created the PoC VPC for you, If you want to deploy any additional EC2 instances that need to access the FSx file system, ensure the EC2 instances are added to the VPC security group of **FSxLustrePoCSecurityGroup**. Below are links which have instructions on how to manually deploy additional EC2 or FSx instances post-deployment, if required.
+- [Launch your own Amazon EC2 instances.](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html#ec2-launch-instance)
+- [Create an FSx for Lustre file system.](https://docs.aws.amazon.com/fsx/latest/LustreGuide/getting-started.html)
+
+
+#### Mounting the FSx for Lustre file system on the deployed EC2 instance
+
+1. Navigate to the **[Amazon FSx console](https://console.aws.amazon.com/fsx)**
+- Select your FSx for Lustre instance name
+- Click on the **Attach** button
+- Copy the mount commands exactly as shown for this PoC guide as you will use it in Step3. The mount commands will create a directory called "/fsx" and then mount the Lustre file system on "/fsx".
+
+2. Log into your deployed EC2 instance
+- Navigate to the **[Amazon EC2 console](https://console.aws.amazon.com/ec2)**
+- Select the instance and choose **Connect**.
+- For the connection method, choose **Session Manager**.
+- Choose **Connect** to start the session. The connect button may take a few seconds to become accessible when you connect to the EC2 instance using Amazon Systems Manager for the very first time.
+
+3. Once logged into the Amazon EC2 instance:
+- **[Install the Lustre client software](https://docs.aws.amazon.com/fsx/latest/LustreGuide/install-lustre-client.html)** on each compute instance. Use the below command to install it on your Amazon Linux 2023 AMI based EC2 instance:
+
+```bash
+$ sudo dnf install -y lustre-client
+```
+
+
+- Run the commands you copied from the step 1 into the command prompt to create the **/fsx** folder, and then mount the Lustre file system.
+- If you have more than one compute instance, run these commands on each required compute to mount the Lustre file system.
+Review the Post deployment performance tips section below, before copying data to your FSx instance
+
+
+
+## Deployment Validation
+
+You can validate a successful deployment by:
+
+* Navigate to the [**AWS CloudFormation console](https://console.aws.amazon.com/cloudformation)** and verify that the status of the CloudFormation stack that you deployed is showing **CREATE_COMPLETE**.
+
+
+## Running the Guidance and PoC testing
+
+Before commencing with PoC testing scenario's with the deployed PoC VPC environment, lets take a look at some post deployment tips for FSx for Lustre.
+
+
+#### Post deployment performance tips
+
+**Lustre striping configuration**
+
+By default, a 4-component Lustre striping configuring is created for you via the Progressive file layouts (PFL) capability of FSx for Lustre, refer to **[Progressive file layouts](https://docs.aws.amazon.com/fsx/latest/LustreGuide/performance.html#striping-pfl)** for further information. This capability defines different stripe sizes and counts based on the different file sizes that are copied to the file system. A PFL configuration can help simplify managing a file system that has mixed sized files. The default 4-component striping layout of the Progressive file layouts is:
+
+- A stripe count value of 1 for files up to 100MiB in size.
+- A stripe count of 8 for files up to 10GiB in size.
+- A stripe count of 16 for files up to 100GiB in size.
+- A stripe count of 32 for files larger than 100GiB.
+
+**Note**: For all file systems regardless of their creation date, files imported from Amazon S3 using Data Repository Association (DRA) don't use the default PFL layout, but instead use the layout in the file system's **ImportedFileChunkSize** parameter. S3-imported files larger than the ImportedFileChunkSize will be stored on multiple OSTs with a stripe count based on the ImportedFileChunkSize defined value (default 1GiB).
+
+In most cases you don't need to update the default PFL Lustre stripe count/size. However, if your data profile (i.e. file size distribution across dataset/folders) requires a specific Lustre striping configuration (i.e. based on your file size(s) and/or the number of OST's for your file system), then refer to the below section to understand configuring your own Lustre striping configuration.
+
+
+
+**Stripe Count**
+
+
+The stripe count specifies the number of Object Storage Target's (OST's) that will hold chunks of a striped file, on the FSx for Lustre file system. Tuning the stripe count can help distribute chunks of a file across the number of OST's that store the data of the FSx for Lustre file system. A higher stripe count can improve performance in terms of aggregate throughput, especially for files larger than 1Gb. A good starting point is 4-8 stripes. The default is stripe count is 1 for all objects less than 1Mb, or 5 for over 1MB.
+
+View the number of OST's that your FSx file system is bound across.
+
+```bash
+$ lfs df -h
+```
+
+**<IMAGE-HERE**
+
+
+View the current stripe count.
+```bash
+$ lfs getstripe -d /<mountpath>
+```
+
+
+
+**Stripe Size**
+
+
+The stripe size determines the amount of data stored on each OST per file before moving to the next OST to store the file data. The default value is 1MiB, where setting a stripe offset may be useful in special circumstances, but in general it is best to leave it unspecified and use the default value.
+
+*Example: Set a stripe count of 4, and stripe size of 1MB on a mount path*
+
+```bash
+$ lfs setstripe -c 4 -s 1M /<mountpath>
+```
+
+
+Stripe parameters:
+
+```bash
+-c | Stripe count | 0 = use system default, -1 = stripe across all available OSTs
+-s | Stripe size | 0 = use default system size, or set to a value using m (for MB) or g (for GB)
+```
+
+**Note:** Do not set the stripe count to be greater than your OST count.
+
+Refer to **[Striping data in your file system](https://docs.aws.amazon.com/fsx/latest/LustreGuide/performance.html#striping-data)** for further information
+
+**ImportedFileChunkSize**
+
+If your files are imported from an S3 data repository, you can stripe high-throughput files across OSTs by tuning the ImportedFileChunkSize value.
+
+For example, suppose that your workload uses a 7.2 TiB file system (which is made up of 6 x 1.17-TiB OSTs) and needs to drive high throughput across 2.4 GiB files. In this case, you can set the ImportedFileChunkSize value to (2.4 GiB / 6 OSTs) = 400 MiB so that your files are spread evenly across your file system's OSTs.
+
+#### Testing the FSx for Lustre file system
+Testing performance
+It is recommended to use your own application or specific load generation tool that best reflects the data profile and usage characteristics of your workload. If you do not have access to your own load generation tools, you can leverage benchmark tools, such as the **[Flexible I/O (FIO)](https://fio.readthedocs.io/en/latest/index.html)** generator tool, or **[IOR](https://ior.readthedocs.io/en/latest/)** to measure the file system's performance in terms of throughput, IOPS, and latency.
+
+In the subsequent testing sections of this PoC guide, we will provide examples to get your started with using the fio tool, and a single EC2 compute node to test the Lustre file system with. Your actual workload may require many computes nodes to access the file system concurrently, hence its recommended to also test the deployed FSx for Lustre file system with the additional compute nodes that you require (which you can deploy into the PoC VPC).
+
+#### Throughput testing
+
+1. Log into the EC2 instance that you installed the Lustre client on to.
+
+2. Install your application load testing tool, or run the below command to install FIO, as part of this PoC deployment.
+
+```bash
+$ sudo yum -y install fio
+```
+3. Lets navigate to the path that we mounted the FSx for Lustre file system on the EC2 instance (i.e. /fsx), and create a new directory to host your testing data.
+
+```bash
+$ sudo su
+$ mkdir /fsx/performance
+$ cd /fsx/performance
+```
+
+
+4. Run your application load testing tool to test the throughput performance and latency of the FSx for Lustre file system. If you don't have your own performance testing tools, you can use the below instructions, which will use the fio tool (that you installed) to generate an IO load on the FSx file system based on a 1MB block size
+
+The below example fio command will:
+- Create a 10GB test file called ***mytestfile*** under ***/fsx/performance***
+- Generate an IO load pattern with a 50/50 read/write ratio, random read/write pattern with a block size of 1MB, with job runtime duration of 120 seconds.
+
+```bash
+$ sudo fio --name=fiotest-throughput  --filename=/fsx/performance/mytestfile --direct=1 --rw=randrw  --rwmixread=50 --bs=1MB --size=10GB --ioengine=libaio --iodepth=64  --numjobs=2 --randrepeat=1 --group_reporting --runtime=120 --time_based
+```
+
+Below is an output of the above example fio test command. At the bottom of the output, you are provided with the ***READ & WRITE*** bandwidth achieved in terms of ***MiB/s***. The fio output values that you obtain when you run this command will vary based on the configuration of your FSx file system size and striping, EC2 instance type and configuration, and fio load testing parameters selected.
+
+**<IMAGE-HERE**
+
+**fio parameters:**
+You can use your own values for the fio parameters, based on your actual workload requirements. [Refer to the Flexible I/O (FIO) generator tool for further information on configurable parameters](https://fio.readthedocs.io/en/latest/index.html)
+
+```bash
+--bs = block size
+--iodepth = io depth
+--size = size of your test file for the IO load test
+--readwrite = read/write pattern for test
+--rwmixread = read/write ratio for test
+--numjobs = number of jobs in test
+--runtime = length to run job in terms of seconds
+```
+
+#### Performance results
+
+5. View the performance results using your own application tooling. You can also use the **[Amazon FSx console and it's integrated Amazon CloudWatch performance metrics dashboard to view the performance details](https://docs.aws.amazon.com/fsx/latest/LustreGuide/monitoring-cloudwatch.html)** (i.e. results of the fio tests conducted).
+
+
+**<IMAGE-HERE**
+
+
+6. Compare the observed PoC performance metrics with your expected requirements, and enter your test results into the key success criteria matrix for each scenario that you run.
+
+7. If the observed performance metrics do not meet your requirements, then make any required adjustments to your application stack across: your application, the EC2 instance types, EFA configuration, or Lustre file system (throughput, capacity, striping parameters) and re-run tests again.
+
+
+#### Testing features and integration
+
+**Dynamic scaling of provisioned Storage capacity**
+
+- Navigate to the **[Amazon FSx console](https://console.aws.amazon.com/fsx)**
+- Select your FSx Instance
+- Click on **Action** 🡪 **Update storage capacity**
+- Update capacity in increments of 2400GB
+- Select **Update**
+- Monitor the **Updates** tab within the FSx console for update operation to show a completed status, before using the file system for any testing
+
+**Dynamic scaling of provisioned Throughput per-unit of storage (Persistent storage only)**
+
+- Navigate to the **[Amazon FSx console](https://console.aws.amazon.com/fsx)**
+- Select your FSx Instance
+- Select **Actions** 🡪 **Update Throughput tier**
+- Increase or decrease Throughput value as required
+- Select **Update**
+- Monitor the **Updates** tab within the FSx console for update operation to show a completed status, before using the file system for any testing
+
+**Dynamic scaling of Metadata IOPS (Persistent storage only)**
+- Navigate to the **[Amazon FSx console](https://console.aws.amazon.com/fsx)**
+- Select your FSx Instance
+- Select **Actions** 🡪 **Update Metadata IOPS**
+- Select between Automatic or User-provisioned Metadata IOPS values
+- Select **Update**
+- Monitor the **Updates** tab within the FSx console for update operation to show a completed status, before using the file system for any testing
+
+#### Amazon S3 integration for automatic import and export of data (only for S3-Linked FSx for Lustre file systems)
+Perform the below actions to test the FSx for Lustre & S3 automatic import/export capability.
+
+**Note**: You can view the name of the S3 bucket linked to your FSx file system within the FSx console, it's under the FSx Instance's Data repository tab details.
+
+**Connect to EC2 instance:**
+- Navigate to the **[Amazon EC2 console](https://console.aws.amazon.com/ec2)**
+- In the navigation pane, choose **Instances**
+- Select the instance and choose **Connect**
+- For the connection method, choose **Session Manager**
+- Select **Connect** to start the session
+
+**Test the automatic export of data to an S3 bucket, for data created/modified on the FSx file system**
+
+- Create one or more new files on the mount-point that is hosting the FSx file system (i.e. /fsx)
+- Navigate to the **[Amazon S3 console](https://console.aws.amazon.com/s3)**
+- Select your S3 bucket
+- Refresh the screen to get the latest view of the data in your S3 bucket
+- Verify the data you created on the mounted FSx file system, has been auto exported to the S3 bucket.
+
+
+**Test the automatic import of metadata and data from S3, into the to FSx file system**
+- Upload new data into your S3 bucket
+- Navigate back to your EC2 compute node
+- Navigate to your FSx for Lustre file system mount-point (i.e. /fsx)
+- Perform a list operation ```ls -ltr```  on the directory to get the latest list of file metadata
+- Verify that you can see the new file names in your directory (i.e. /fsx), for the new data you uploaded into S3 in the previous step.
+
+
+## Next Steps - PoC testing for different scenarios
+
+Additionally, you may want to validate different workload scenarios, by testing with different parameters/configurations in your PoC. Below are a few examples of different scenarios you could test for.
+
+- Read-only, read/write, or write only data workload patterns
+- Long duration jobs (many hours) vs short duration (minutes)
+- Different compute instance(s) types
+- Number of concurrent client nodes accessing the FSx file system
+- Different datasets, or files of different sizes
+
+## Cleanup
+
+Before deleting the deployed CloudFormation stack, you need to manually delete any new AWS resources you have manually created in the PoC VPC after deployment (i.e. additional EC2 compute instances, or new/updated IAM roles), and delte any data your have uploaded to the auto-created S3 bucket.
+
+To delete the PoC Guidance:
+
+- Navigate to the **[AWS CloudFormation console](https://console.aws.amazon.com/cloudformation)**
+- Select the Cloudformation stack that you deployed as part of this Guidance, then select **Delete**
+  - **Note:** AWS resources deployed by the PoC guidance CloudFormation template will be tagged with the name of the CloudFormation stack name you provided during deployment. (i.e. ```aws:cloudformation:stack-name: <your-stack-name>```)
+
+## Notices
 
 Include a legal disclaimer
 
@@ -210,6 +523,7 @@ Include a legal disclaimer
 *Customers are responsible for making their own independent assessment of the information in this Guidance. This Guidance: (a) is for informational purposes only, (b) represents AWS current product offerings and practices, which are subject to change without notice, and (c) does not create any commitments or assurances from AWS and its affiliates, suppliers or licensors. AWS products or services are provided “as is” without warranties, representations, or conditions of any kind, whether express or implied. AWS responsibilities and liabilities to its customers are controlled by AWS agreements, and this Guidance is not part of, nor does it modify, any agreement between AWS and its customers.*
 
 
-## Authors (optional)
 
-Name of code contributors
+## Authors
+- Wali Akbari
+- Sebastien Berube
