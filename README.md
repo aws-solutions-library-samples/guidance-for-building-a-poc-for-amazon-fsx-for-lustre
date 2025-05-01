@@ -3,16 +3,16 @@
 
 ## Table of Contents
 
-1. [Overview](#overview-required)
-2. [Methodology for conducting a PoC](#Methodology-for-conducting-a-Proof-of_Concept)
+1. [Overview](#overview)
+2. [Methodology for conducting a PoC](#Methodology-for-conducting-a-PoC)
 3. [Example of a PoC key success criteria matrix](#Example-of-a-PoC-key-success-criteria-matrix)
-4. [FSx for Lustre configuration guidance](#Deployment-Guidance)
-5. [Prerequisites](#prerequisites-required)
-6. [PoC deployment steps](#deployment-steps-required)
-7. [Deployment validation](#deployment-validation-required)
-8. [Running the Guidance and PoC testing](#running-the-guidance-required)
-9. [Next Steps - Further PoC testing for different scenarios](#Next-Steps-Further-PoC-testing-for-different-scenarios)
-10. [Cleanup](#cleanup-required)
+4. [FSx for Lustre configuration guidance](#FSx-for-Lustre-configuration-guidance)
+5. [Prerequisites](#Prerequisites)
+6. [PoC deployment steps](#PoC-Guidance-deployment-Steps)
+7. [Deployment validation](#Deployment-Validation)
+8. [Running the Guidance and PoC testing](#Running-the-Guidance-and-PoC-testing)
+9. [Next Steps & testing for different scenarios](#Next-Steps-&-testing-for-different-scenarios)
+10. [Cleanup](#cleanup)
 
 <br/><br/>
 
@@ -504,9 +504,9 @@ Perform the below actions to test the FSx for Lustre & S3 automatic import/expor
 
 <br/><br/>
 
-## Next Steps - PoC testing for different scenarios
+## Next Steps & testing for different scenarios
 
-Additionally, you may want to validate different workload scenarios, by testing with different parameters/configurations in your PoC. Below are a few examples of different scenarios you could test for.
+As part of a PoC, you may want to validate different workload scenarios, or even a different workload on FSx for Lustre, by testing with different parameters/configurations in your PoC. Below are a few examples of different scenarios you could test for in your PoC VPC environment (if requierd).
 
 - Read-only, read/write, or write only data workload patterns
 - Long duration jobs (many hours) vs short duration (minutes)
