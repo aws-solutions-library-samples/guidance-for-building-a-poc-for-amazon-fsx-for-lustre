@@ -1,0 +1,390 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template to deploy a PoC VPC with components of: Amazon FSx for Lustre and Amazon EC2 '
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "VPC Configuration"
+        Parameters:
+          - VpcCidr
+          - PublicSubnetCidr
+          - PrivateSubnetCidr
+          - AvailabilityZone
+      - Label:
+          default: "FSx for Lustre Configuration"
+        Parameters:
+          - FileSystemName
+          - LustreDeploymentType
+          - StorageCapacity
+          - DataCompression 
+
+    ParameterLabels:
+      VpcCidr:
+        default: "VPC CIDR Range"
+      PublicSubnetCidr:
+        default: "Public Subnet CIDR Range"
+      PrivateSubnetCidr:
+        default: "Private Subnet CIDR Range"
+      AvailabilityZone:
+        default: "Availability Zone"
+      FileSystemName:
+        default: "File System Name"
+      LustreDeploymentType:
+        default: "Deployment Type"
+      StorageCapacity:
+        default: "Storage Capacity (GB)"
+      DataCompression:
+        default: "Select the data compression type you want to enable"
+
+
+Parameters:
+  VpcCidr:
+    Type: String
+    Default: '10.0.0.0/16'
+    Description: CIDR block for the VPC (must be /16 to /28)
+    AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([1-2][0-9]|3[0-2]))$'
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+
+  PublicSubnetCidr:
+    Type: String
+    Default: '10.0.2.0/24'
+    Description: CIDR block for the public subnet (must be within VPC CIDR)
+    AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([1-2][0-9]|3[0-2]))$'
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+    
+  PrivateSubnetCidr:
+    Type: String
+    Default: '10.0.1.0/24'
+    Description: CIDR block for the private subnet (must be within VPC CIDR)
+    AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([1-2][0-9]|3[0-2]))$'
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+
+  AvailabilityZone:
+    Type: AWS::EC2::AvailabilityZone::Name
+    Description: Availability Zone for the public and private subnet
+
+  FileSystemName:
+    Type: String
+    Default: 'MyLustreFS'
+    Description: Name of FSx for Lustre File System
+
+  LustreDeploymentType:
+    Type: String
+    Default: 'SCRATCH_2'
+    AllowedValues:
+      - 'SCRATCH_2'
+    Description: FSx for Lustre storage deployment type
+
+  StorageCapacity:
+    Type: Number
+    Default: 1200
+    MinValue: 1200
+    Description: Storage capacity for FSx for Lustre (allowed values minimum 1200, after that multiples of 2400). SCRATCH_2 deployments have 200MB/s per TiB of throughput capacity 
+  
+  DataCompression:
+    Type: String
+    Default: 'LZ4'
+    AllowedValues:
+      - 'NONE'
+      - 'LZ4'      
+    Description: Data compression type for FSx file system   
+
+   
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
+    Description: Latest Amazon Linux 2023 AMI (HVM) x86_64. DO NOT UPDATE THIS VALUE
+    
+Resources:
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: PoC-FSx-Lustre-VPC-Scratch
+          
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PrivateSubnetCidr
+      AvailabilityZone: !Ref AvailabilityZone
+      Tags:
+        - Key: Name
+          Value: Private-Subnet
+          
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: IGW for VPC
+          
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PublicSubnetCidr
+      AvailabilityZone: !Ref AvailabilityZone
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: Public-Subnet
+
+
+  NatGatewayEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    DependsOn: AttachGateway
+    Properties:
+      AllocationId: !GetAtt NatGatewayEIP.AllocationId
+      SubnetId: !Ref PublicSubnet
+      Tags:
+        - Key: Name
+          Value: FSx-Lustre-NAT
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: Public-Route-Table
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: Private-Route-Table
+
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway
+
+  PrivateSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet
+      RouteTableId: !Ref PrivateRouteTable
+      
+  FSxLustrePoCSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: FSxLustrePoCSecurityGroup
+      GroupDescription: Security group for FSx Lustre
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 988
+          ToPort: 988
+          CidrIp: !Ref VpcCidr
+        - IpProtocol: tcp
+          FromPort: 1021
+          ToPort: 1023
+          CidrIp: !Ref VpcCidr
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: FSxLustrePoCSecurityGroup
+
+          
+  FSxLustre:
+    Type: AWS::FSx::FileSystem
+    Properties:
+      FileSystemType: LUSTRE
+      StorageCapacity: !Ref StorageCapacity
+      SubnetIds: 
+        - !Ref PrivateSubnet
+      SecurityGroupIds: 
+        - !Ref FSxLustrePoCSecurityGroup
+      FileSystemTypeVersion: "2.12"
+      LustreConfiguration:
+        DeploymentType: !Ref LustreDeploymentType
+        DataCompressionType : !Ref DataCompression
+        WeeklyMaintenanceStartTime: '7:01:00'
+      Tags:
+        - Key: Name
+          Value: !Ref FileSystemName
+          
+            
+  EC2KeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Join 
+        - '-'
+        - - 'fsxl-poc-key'
+          - !Select [2, !Split ["/", !Ref "AWS::StackId"]]
+  
+  EC2InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref EC2InstanceRole
+
+  SSMVPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPC
+      VpcEndpointType: Interface
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ssm"
+      SubnetIds:
+        - !Ref PrivateSubnet
+      SecurityGroupIds:
+        - !Ref FSxLustrePoCSecurityGroup
+      PrivateDnsEnabled: true
+
+  SSMMessagesVPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPC
+      VpcEndpointType: Interface
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ssmmessages"
+      SubnetIds:
+        - !Ref PrivateSubnet
+      SecurityGroupIds:
+        - !Ref FSxLustrePoCSecurityGroup
+      PrivateDnsEnabled: true
+
+  EC2MessagesVPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPC
+      VpcEndpointType: Interface
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ec2messages"
+      SubnetIds:
+        - !Ref PrivateSubnet
+      SecurityGroupIds:
+        - !Ref FSxLustrePoCSecurityGroup
+      PrivateDnsEnabled: true
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    DependsOn: 
+      - SSMVPCEndpoint
+      - SSMMessagesVPCEndpoint
+      - EC2MessagesVPCEndpoint
+    Properties:
+      InstanceType: c6in.2xlarge
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 50
+            VolumeType: gp3
+            DeleteOnTermination: true 
+      ImageId: !Ref LatestAmiId
+      KeyName: !Ref EC2KeyPair
+      SubnetId: !Ref PrivateSubnet
+      SecurityGroupIds: 
+        - !Ref FSxLustrePoCSecurityGroup
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      Tags:
+        - Key: Name
+          Value: FSx-Lustre-Client
+        
+
+Outputs:
+  VPCId:
+    Description: VPC ID
+    Value: !Ref VPC
+
+
+  VpcCidrBlock:
+    Description: VPC CIDR Block
+    Value: !GetAtt VPC.CidrBlock
+    
+  PublicSubnetCidrBlock:
+    Description: Public Subnet CIDR Block
+    Value: !GetAtt PublicSubnet.CidrBlock
+
+
+  PrivateSubnetCidrBlock:
+    Description: Private Subnet CIDR Block
+    Value: !GetAtt PrivateSubnet.CidrBlock
+
+  FSxFileSystemId:
+    Description: FSx Lustre File System ID
+    Value: !Ref FSxLustre
+
+  FSxFileSystemDNSName:
+    Description: FSx Lustre File System DNS Name
+    Value: !GetAtt FSxLustre.DNSName    
+
+  InstanceId:
+    Description: ID of the created EC2 instance
+    Value: !Ref EC2Instance
+
+  KeyPairName:
+    Description: Name of the created key pair
+    Value: !Ref EC2KeyPair
+
+  NatGatewayId:
+    Description: NAT Gateway ID
+    Value: !Ref NatGateway
+
+  InternetGatewayId:
+    Description: Internet Gateway ID
+    Value: !Ref InternetGateway
+    
+    
+ 
