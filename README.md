@@ -27,7 +27,7 @@ Amazon FSx for Lustre is a fully managed file system that is optimized for high-
 
 Amazon FSx eliminates the traditional complexity of setting up and managing high-performance Lustre file systems, allowing you to spin up, run, and scale a high-performance file system that provides sub-millisecond access to data stored in the Lustre file system, in minutes. FSx for Lustre also provides multiple deployment options for cost optimization. Amazon FSx for Lustre also integrates with Amazon S3, making it easy to process cloud data sets with the Lustre high-performance file system. When linked to an S3 bucket, an FSx for Lustre file system transparently presents S3 objects as files and can automatically update the contents of the linked S3 bucket as files are added to, changed in, or deleted from the file system.
 
-<img src="assets/images/architecture.JPG" width="660" height="385" />
+<img src="assets/images/architecture.JPG" width="720" height="420" />
 
 <br/><br/>
 
@@ -43,12 +43,12 @@ _We recommend creating a [Budget](https://docs.aws.amazon.com/cost-management/l
 
 ### Sample Cost Table
 
-As an example, if you deploy the default EC2 instance type deployed by this Guidance (**c6in.8xlarge**), and also deploy an **9600GiB** FSx for Lustre SCRATCH-SSD based file system (which provides **1920 MB/s Throughput Capacity**) in the US-East (N. Virginia) region, as of April 2025 the cost is approximately **$2,670.08 USD per-month** while you are running this PoC guidance. The cost breakdown is provided as below, where you values will differ based on the size and type of the FSx file system and EC2 instance(s) you deploy.
+As an example, if you deploy this Guidance with its default **c6in.8xlarge** EC2 Instance type, and also deploy a **9600GiB** FSx for Lustre SCRATCH-SSD based file system (which provides **1920 MB/s Throughput Capacity**) in the US-East (N. Virginia) region, as of April 2025 the cost to run this Guidance is approximately **$2,670.08 USD per-month**. The cost breakdown is provided as below, where you values will differ based on the type and size of the EC2 instance and FSx file system you deploy.
 
 | AWS service  | Dimensions | Example sizing |  Example cost [USD]  |
 | ----------- | ------------ | ------------ | ------------  |
-| Amazon FSx for Lustre  | $0.140 per GB-month for a SCRATCH-SSD instance type | 9600GiB  | $ 1,345.54 per-month |
-| Amazon EC2 | $1.8144 on-demand per-hour for c6in.8xlarge instance type | Single c6in.8xlarge instance | $ 1,324.51 per-month |
+| Amazon FSx for Lustre  | $0.140 per GB-month for SCRATCH-SSD file system | 9600GiB  | $ 1,345.54 per-month |
+| Amazon EC2 | $1.8144 per-hour for c6in.8xlarge instance | Single c6in.8xlarge instance | $ 1,324.51 per-month |
 
 <br/><br/>
 
@@ -86,9 +86,10 @@ Below is an example PoC key success criteria table that you can populate when yo
 
 ### Scenario 1:
 
+**Workload configuration**
+
 | Item | PoC Value |
 |------|-----------|
-| **Workload configuration** |
 | Amazon EC2 compute instance type to be used by workload |  |
 | Network throughput capability of Amazon EC2 instance selected |  |
 | Number of concurrent compute nodes, or threads used for testing |  |
@@ -97,9 +98,12 @@ Below is an example PoC key success criteria table that you can populate when yo
 | Data read/write access ratio |  |
 | Data sequential/random access ratio |  |
 
+<br/><br/>
+
+**Amazon FSx for Lustre configuration** 
+
 | Item | PoC Value |
 |------|-----------|
-| **Amazon FSx for Lustre configuration** |
 | Storage type deployed |  |
 | Provisioned Storage capacity |  |
 | Provisioned Throughput per-unit of storage (per-TiB) |  |
@@ -107,7 +111,12 @@ Below is an example PoC key success criteria table that you can populate when yo
 | Compression enabled (Y/N) |  |
 | S3-Linked FSx file system (Y/N) |  |
 
-| Items for performance testing | Target value | PoC value |
+
+<br/><br/>
+
+**Performance testing**
+
+| Metric | Target value | PoC value |
 |------------------------------|--------------|-----------|
 | Latency (ms) |  |  |
 | Throughput (MB/s) |  |  |
@@ -115,7 +124,11 @@ Below is an example PoC key success criteria table that you can populate when yo
 | Application specific performance metric(s) |  |  |
 | Workload job duration time (short vs long jobs) |  |  |
 
-| Functional testing | Outcome |
+<br/><br/>
+
+**Functional testing**
+
+| Feature | Outcome |
 |-------------------|---------|
 | Scale Throughput per-unit of storage capacity (up or down) |  |
 | Scale up storage capacity |  |
@@ -220,14 +233,17 @@ For EFA configuration, ensure the Lustre client software on your EC2 instances i
 
 ### AWS account requirements
 
-- Access to the AWS Console or AWS CLI, with the required IAM privileges to deploy the AWS CloudFormation deployment templates, and create/manage AWS resources. You can run the below example commands to verify if your role has the access required access to create AWS resources required for the PoC guidance deployment [Amazon EC2, Amazon S3, Amazon FSx, AWS CloudFormation, AWS IAM]
+- Access to the AWS Console or AWS CLI, with the required IAM privileges to deploy the AWS CloudFormation deployment templates, and create/manage AWS resources.
+- You can run the below example commands (on a Linux based client) to verify if your role has the access required access to create AWS resources required for the PoC guidance deployment [Amazon EC2, Amazon S3, Amazon FSx, AWS CloudFormation, AWS IAM]
+
+**Get my user's identity**
 
 ```bash
-# Get my user's identity
 MYARN="$(aws sts get-caller-identity --query Arn | tr -d '"')"
+```
 
-# Below are examples of how you can check if you have the required permissions to create an FSx instance, EC2 instance, S3 bucket and a VPC Security Group
-
+**Below are examples of how you can check if you have the required permissions to create an FSx instance, EC2 instance, S3 bucket and a VPC Security Group**
+```bash
 aws iam simulate-principal-policy --policy-source-arn $MYARN --action-names "fsx:CreateFileSystem" | grep -i decision
 aws iam simulate-principal-policy --policy-source-arn $MYARN --action-names "ec2:CreateSecurityGroup" | grep -i decision
 aws iam simulate-principal-policy --policy-source-arn $MYARN --action-names "ec2:CreateInstance" | grep -i decision
@@ -248,14 +264,14 @@ aws iam simulate-principal-policy --policy-source-arn $MYARN --action-names "s3:
 
 #### Deploying a FSx for Lustre file system in a new PoC VPC environment using CloudFormation
 
-To get started with this PoC Guidance, use AWS CloudFormation to deploy one of the below YAML templates based on your required FSx for Lustre deployment type (i.e. Persistent-SSD or Scratch), and whether you require a standalone FSx file system, or an S3-linked FSx file system.
+To get started and deploy this PoC Guidance, use AWS CloudFormation to deploy one of the below CloudFormation templates (YAML files) based on your required FSx for Lustre file system deployment type (i.e. Persistent-SSD or Scratch), and whether you require a standalone FSx file system, or an S3-linked FSx file system.
 
-| FSx deployment type  | CloudFormation template name | Click to deploy |
-| ----------- | ------------ | ------------ |
-| Persistent-SSD: Standalone FSx for Lustre file system  |  [Persistent2_standalone_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/persistent_standalone_fs.yaml) | **[LAUNCH](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?templateURL=https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/persistent_standalone_fs.yaml)**
-| Persistent-SSD: S3-Linked FSx for Lustre file system | [Persistent2_s3_linked_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/persistent_s3_linked_fs.yaml) | **[LAUNCH](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?templateURL=https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/persistent_s3_linked_fs.yaml)**
-| Scratch: Standalone FSx for Lustre file system  | [scratch2_standalone_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/scratch2_standalone_fs.yaml) | **[LAUNCH](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?templateURL=https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/scratch2_standalone_fs.yaml)**
-| Scratch: S3-Linked FSx for Lustre file system | [scratch2_s3_linked_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/scratch2_s3_linked_fs.yaml) | **[LAUNCH](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?templateURL=https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/scratch2_s3_linked_fs.yaml)**
+| FSx file system type| File system mode : Standalone or S3-linked | CloudFormation template |
+| ----------- | ------------ | ------------ | 
+| Persistent-SSD | Standalone FSx for Lustre file system  |  [Persistent2_standalone_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/persistent_standalone_fs.yaml) |
+| Persistent-SSD | S3-Linked FSx for Lustre file system | [Persistent2_s3_linked_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/persistent_s3_linked_fs.yaml) |
+| Scratch | Standalone FSx for Lustre file system  | [scratch2_standalone_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/scratch2_standalone_fs.yaml) |
+| Scratch | S3-Linked FSx for Lustre file system | [scratch2_s3_linked_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/scratch2_s3_linked_fs.yaml) | 
 
 Refer to the **output** tab of the deployed AWS CloudFormation stack, which will provide details of the AWS resources created and their ID's.
 
