@@ -27,7 +27,7 @@ Amazon FSx for Lustre is a fully managed file system that is optimized for high-
 
 Amazon FSx eliminates the traditional complexity of setting up and managing high-performance Lustre file systems, allowing you to spin up, run, and scale a high-performance file system that provides sub-millisecond access to data stored in the Lustre file system, in minutes. FSx for Lustre also provides multiple deployment options for cost optimization. Amazon FSx for Lustre also integrates with Amazon S3, making it easy to process cloud data sets with the Lustre high-performance file system. When linked to an S3 bucket, an FSx for Lustre file system transparently presents S3 objects as files and can automatically update the contents of the linked S3 bucket as files are added to, changed in, or deleted from the file system.
 
-<img src="assets/images/architecture.JPG" width="600" height="350" />
+<img src="assets/images/architecture.JPG" width="660" height="385" />
 
 <br/><br/>
 
@@ -343,7 +343,7 @@ View the number of OST's that your FSx file system is bound across.
 $ lfs df -h
 ```
 
-**<IMAGE-HERE**
+<img src="assets/images/lfs.JPG" width="577" height="400" />
 
 
 View the current stripe count.
@@ -416,9 +416,9 @@ The below example fio command will:
 $ sudo fio --name=fiotest-throughput  --filename=/fsx/performance/mytestfile --direct=1 --rw=randrw  --rwmixread=50 --bs=1MB --size=10GB --ioengine=libaio --iodepth=64  --numjobs=2 --randrepeat=1 --group_reporting --runtime=120 --time_based
 ```
 
-Below is an output of the above example fio test command. At the bottom of the output, you are provided with the ***READ & WRITE*** bandwidth achieved in terms of ***MiB/s***. The fio output values that you obtain when you run this command will vary based on the configuration of your FSx file system size and striping, EC2 instance type and configuration, and fio load testing parameters selected.
+Below is an output of the above example fio test command. At the bottom of the output, you are provided with the ***READ & WRITE*** bandwidth achieved in terms of ***MiB/s*** for the fio command taht was run. The fio output values that you obtain when you run this command will vary based on the configuration of your FSx file system size and striping, EC2 instance type and configuration, and fio load testing parameters selected.
 
-**<IMAGE-HERE**
+<img src="assets/images/fio.JPG" width="889" height="496" />
 
 **fio parameters:**
 You can use your own values for the fio parameters, based on your actual workload requirements. [Refer to the Flexible I/O (FIO) generator tool for further information on configurable parameters](https://fio.readthedocs.io/en/latest/index.html)
@@ -438,8 +438,7 @@ You can use your own values for the fio parameters, based on your actual workloa
 5. View the performance results using your own application tooling. You can also use the **[Amazon FSx console and it's integrated Amazon CloudWatch performance metrics dashboard to view the performance details](https://docs.aws.amazon.com/fsx/latest/LustreGuide/monitoring-cloudwatch.html)** (i.e. results of the fio tests conducted).
 
 
-**<IMAGE-HERE**
-
+<img src="assets/images/cloudwatch.JPG" width="716" height="426" />
 
 6. Compare the observed PoC performance metrics with your expected requirements, and enter your test results into the key success criteria matrix for each scenario that you run.
 
