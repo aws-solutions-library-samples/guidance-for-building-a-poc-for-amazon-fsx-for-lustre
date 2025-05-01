@@ -43,11 +43,12 @@ _We recommend creating a [Budget](https://docs.aws.amazon.com/cost-management/l
 
 ### Sample Cost Table
 
-As an example, if you deploy this Guidance with its default **c6in.8xlarge** EC2 Instance type, and also deploy a **9600GiB** FSx for Lustre SCRATCH-SSD based file system (which provides **1920 MB/s Throughput Capacity**) in the US-East (N. Virginia) region, as of April 2025 the cost to run this Guidance is approximately **$2,670.08 USD per-month**. The cost breakdown is provided as below, where you values will differ based on the type and size of the EC2 instance and FSx file system you deploy.
+As an example, if you deploy this Guidance with its default **c6in.8xlarge** EC2 Instance type, and also deploy a **9600GiB** FSx for Lustre SCRATCH-SSD based file system (which provides **1920 MB/s Throughput Capacity**) in the US-East (N. Virginia) region, as of April 2025 the cost to run this Guidance is approximately **$2,670.08 USD per-month**. 
+The cost breakdown is provided as below, where you values will differ based on the type and size of the EC2 instance and FSx file system you deploy.
 
 | AWS service  | Dimensions | Example sizing |  Example cost [USD]  |
 | ----------- | ------------ | ------------ | ------------  |
-| Amazon FSx for Lustre  | $0.140 per GB-month for SCRATCH-SSD file system | 9600GiB  | $ 1,345.54 per-month |
+| Amazon FSx for Lustre  | $0.140 per GB-month for SCRATCH-SSD file system | 9,600 GiB  | $ 1,345.54 per-month |
 | Amazon EC2 | $1.8144 per-hour for c6in.8xlarge instance | Single c6in.8xlarge instance | $ 1,324.51 per-month |
 
 <br/><br/>
