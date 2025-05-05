@@ -164,11 +164,11 @@ Throughput for the entire filesystem is calculated based on the amount of provis
 
 Example: If your application required 4TiB of persistent storage capacity and requires 2,000MB/s of aggregate throughput, then:
 
-- You could provision a FSx for Lustre file system with 4.8TiB of Persistent-SSD storage capacity, with 500MB/s of throughput per-TiB. This will provide 2400MB/s of **[aggregate baseline disk throughput capability](https://docs.aws.amazon.com/fsx/latest/LustreGuide/performance.html#fsx-aggregate-perf)** (4.8TiB * 500MB/s = 2400MB/s).
+- You could provision a FSx for Lustre file system with 4.8TiB of Persistent-SSD storage capacity, with 500MB/s per-TiB of throughput capacity. This will provide 2400MB/s of **[aggregate baseline disk throughput capability](https://docs.aws.amazon.com/fsx/latest/LustreGuide/performance.html#fsx-aggregate-perf)** (4.8TiB * 500MB/s per-TiB storage throughput capacity = 2400MB/s).
 
-- Alternatively, you could provision 9.6TiB of Persistent-SSD storage capacity, with 250MB/s per-TiB throughput to achieve the same 2400MB/s of aggregate baseline disk throughput capability (9.6TiB * 250MB/s = 2400MB/s).
+- Alternatively, you could provision 9.6TiB of Persistent-SSD storage capacity, with 250MB/s per-TiB throughput capacity to achieve the same 2400MB/s of aggregate baseline disk throughput capability (9.6TiB * 250MB/s  per-TiB of throughput capacity = 2400MB/s).
 
-- This second configuration will provide more storage capacity and more backend OST nodes, which could provide increased performance (based on your file size and stripe count configuration)
+- This second configuration will provide more storage capacity and also more backend OST nodes that you can use to to further stripe your data across. This can be helpful when you have large GB size files for your workload, and can distribute the stripe of these large files across many OST nodes.
 
 **Note**: Use the **[AWS pricing calculator](https://calculator.aws/#/estimate)** to model the cost of different FSx storage& throughput capacity options available for your specific requirements (such as above).
 
