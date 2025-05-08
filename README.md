@@ -206,15 +206,13 @@ When you require more baseline throughput capacity performance and not additiona
 
 #### Amazon EC2 compute instance guidance
 
-When launching EC2 instances for your compute-intensive workload, choose instance types that have the GPU/CPU, memory, and dedicated network performance that your application requires. For example youc ould use **[C6in instance types](https://aws.amazon.com/ec2/instance-types/c6i/)** or **[Hpc7g instance types](https://aws.amazon.com/ec2/instance-types/c6i/)** which designed for compute-intensive workloads with dedicated network bandwdith and/or EFA support. Selecting the appropriate EC2 compute instance(s) for your application, will enable you to better leverage the performance capabilities of the FSx for Lustre file system.  When selecting the EC2 Instances for your application, take note of the **[baseline Gbps network bandwidth per EC2 instance type](https://docs.aws.amazon.com/ec2/latest/instancetypes/co.html#co_network)**, and select instances that are network optimized and have dedicated baseline network throughput vs burst for network throughput.
-
-If you are using Amazon EC2 instances with more than 64GiB of memory or 64 vCPU, **[then apply these performance tips](https://docs.aws.amazon.com/fsx/latest/LustreGuide/performance.html#performance-tips)**.
+When launching EC2 instances for your compute-intensive workload, choose instance types that have the GPU/CPU, memory, and dedicated network performance that your application requires. For example youc ould use **[C6in instance types](https://aws.amazon.com/ec2/instance-types/c6i/)** or **[Hpc7g instance types](https://aws.amazon.com/ec2/instance-types/hpc7g/)** which designed for compute-intensive workloads with dedicated network bandwdith and/or EFA support. Selecting the appropriate EC2 compute instance(s) for your application, will enable you to better leverage the performance capabilities of the FSx for Lustre file system.  When selecting the EC2 Instances for your application, take note of the **[baseline Gbps network bandwidth per EC2 instance type](https://docs.aws.amazon.com/ec2/latest/instancetypes/co.html#co_network)**, and select instances that are network optimized and have dedicated baseline network throughput vs burst for network throughput. If you are using EC2 instances with more than 64GiB of memory or 64 vCPU, **[then apply these performance tips](https://docs.aws.amazon.com/fsx/latest/LustreGuide/performance.html#performance-tips)**.
 
 #### Elastic Fabric Adapter (EFA):
 
-If your application requires high levels of network throughput, then you can look at using at using EC2 Instances that support the Elastic Fabric Adapter (EFA). EFA is a network interface that provides low-latency, high-throughput communication for distributed applications running on Amazon EC2 instances. If you are selecting an EC2 instance for your workload that supports EFA, it's highly recommended to enable EFA on that EC2 instance, as EFA reduces network latency and increases network bandwidth for FSx for Lustre file system access. **[Refer to this link for EC2 instance types that support EFA](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa.html#efa-instance-types)**.
+If your application requires high levels of network throughput, then you can look at using Elastic Fabric Adapter (EFA) **[Elastic Fabric Adapter (EFA)](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa.html)** when you deploy an FSx for Lustre file system, and also when selecting EC2 compute instances types, that support EFA. EFA is a network interface that provides low-latency, high-throughput communication for distributed applications running on EC2 instances, wehre you can deploy **[persisent-SSD based FSx for Lustre file systems with EFA enabled](https://aws.amazon.com/blogs/aws/amazon-fsx-for-lustre-unlocks-full-network-bandwidth-and-gpu-performance/)**. For high performance GPU based workloads, note that FSx for Lustre supports NVIDIA GPUDirect Storage (GDS), where GDS is a technology that creates a direct data path between local or remote storage and GPU memory.
 
-For EFA configuration, ensure the Lustre client software on your EC2 instances is configured to leverage the EFA network interface, and that it is **[configured optimally](https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html)**. This typically involves setting the appropriate Lustre mount options, such as **osd_timeout , rmtclient_timeout** and **max_read_ahead_mb.**
+If you are selecting an EC2 instance for your workload that supports EFA, it's highly recommended to enable EFA on that EC2 instance, as EFA reduces network latency and increases network bandwidth for FSx for Lustre file system access. **[Refer to this link for EC2 instance types that support EFA](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa.html#efa-instance-types)**. For EFA configuration, ensure the Lustre client software on your EC2 instances is configured to leverage the EFA network interface, and that it is **[configured optimally](https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html)**. This typically involves setting the appropriate Lustre mount options, such as **osd_timeout , rmtclient_timeout** and **max_read_ahead_mb.**
 
 <br/><br/>
 
@@ -274,8 +272,6 @@ To get started and deploy this PoC Guidance, use AWS CloudFormation to deploy on
 | Scratch | Standalone FSx for Lustre file system  | [scratch2_standalone_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/scratch2_standalone_fs.yaml) |
 | Scratch | S3-Linked FSx for Lustre file system | [scratch2_s3_linked_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/scratch2_s3_linked_fs.yaml) | 
 
-Refer to the **output** tab of the deployed AWS CloudFormation stack, which will provide details of the AWS resources created and their ID's.
-
 Each of the sample AWS CloudFormation YAML templates provided in this Guidance will deploy the following:
 
 - A new Amazon VPC with a private subnet, a public subnet and Internet Gateway.
@@ -286,10 +282,17 @@ Each of the sample AWS CloudFormation YAML templates provided in this Guidance w
 - An Amazon FSx for Lustre instance in the private subnet
 - An Amazon S3 bucket (if you selected to deploy a S3-linked FSx for Lustre file system)
 
-**Note**: After you have deployed the guidance and it has created the PoC VPC for you, If you want to deploy any additional EC2 instances that need to access the FSx file system, ensure the EC2 instances are added to the VPC security group of **FSxLustrePoCSecurityGroup**. Below are links which have instructions on how to manually deploy additional EC2 or FSx instances post-deployment, if required.
-- [Launch your own Amazon EC2 instances.](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html#ec2-launch-instance)
-- [Create an FSx for Lustre file system.](https://docs.aws.amazon.com/fsx/latest/LustreGuide/getting-started.html)
+**Note**: After you have deployed the guidance and it has created the PoC VPC for you, If you want to deploy any additional EC2 instances that need to access the FSx file system, ensure the EC2 instances are added to the VPC security group of **FSxLustrePoCSecurityGroup**. 
 
+#### Deploying the Guidance CloudFormation template
+
+1. Download one of the provided CloudFormation templates (YAML files) from above, based on your required FSx for Lustre file system.
+2. Navigate to the **[AWS CloudFormation console](https://console.aws.amazon.com/cloudformation)**
+- Select **Create stack** with new resources
+- Click on the **Upload a template file**, and select the the CloudFormation template you downloaded.
+- Select **Next** and follow the instructions to deploy the stack
+- Refer to the **output** tab of the deployed AWS CloudFormation stack, which will provide details of the AWS resources created and their ID's.
+- **IMPORTANT**: Wait until your stack shows a status of **CREATE_COMPLETE** before proceeding to the next step.
 
 #### Mounting the FSx for Lustre file system on the deployed EC2 instance
 
@@ -323,7 +326,7 @@ Review the Post deployment performance tips section below, before copying data t
 
 You can validate a successful deployment by:
 
-* Navigate to the [**AWS CloudFormation console](https://console.aws.amazon.com/cloudformation)** and verify that the status of the CloudFormation stack that you deployed is showing **CREATE_COMPLETE**.
+Navigate to the **[AWS CloudFormation console](https://console.aws.amazon.com/cloudformation)** and verify that the status of the CloudFormation stack that you deployed is showing **CREATE_COMPLETE**.
 
 <br/><br/>
 
