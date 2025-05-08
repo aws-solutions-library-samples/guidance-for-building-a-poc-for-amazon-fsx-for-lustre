@@ -1,4 +1,4 @@
-# Guidance for deploying a PoC using Amazon FSx for Lustre
+# Guidance for deploying a PoC of Amazon FSx for Lustre
 
 
 ## Table of Contents
