@@ -305,7 +305,8 @@ Each of the sample AWS CloudFormation YAML templates provided in this Guidance w
 - Navigate to the **[Amazon EC2 console](https://console.aws.amazon.com/ec2)**
 - Select the instance and choose **Connect**.
 - For the connection method, choose **Session Manager**.
-- Choose **Connect** to start the session. The connect button may take a few seconds to become accessible when you connect to the EC2 instance using Amazon Systems Manager for the very first time.
+- Choose **Connect** to start the session. The connect button may take a moment to become accessible when you connect to the EC2 instance using Amazon Systems Manager for the very first time.
+- **Note**: You can change the default session timeout value for Session Manager sessions to the EC2 instance by [following these instructions.](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-preferences-max-timeout.html)
 
 3. Once logged into the Amazon EC2 instance:
 - **[Install the Lustre client software](https://docs.aws.amazon.com/fsx/latest/LustreGuide/install-lustre-client.html)** on each compute instance. Use the below command to install it on your Amazon Linux 2023 AMI based EC2 instance:
