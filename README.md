@@ -312,7 +312,7 @@ Each of the sample AWS CloudFormation YAML templates provided in this Guidance w
 - **[Install the Lustre client software](https://docs.aws.amazon.com/fsx/latest/LustreGuide/install-lustre-client.html)** on each compute instance. Use the below command to install it on your Amazon Linux 2023 AMI based EC2 instance:
 
 ```bash
-$ sudo dnf install -y lustre-client
+sudo dnf install -y lustre-client
 ```
 
 
@@ -361,7 +361,7 @@ The stripe count specifies the number of Object Storage Target's (OST's) that wi
 View the number of OST's that your FSx file system is bound across.
 
 ```bash
-$ lfs df -h
+lfs df -h
 ```
 
 <img src="assets/images/lfs.JPG" width="577" height="400" />
@@ -369,7 +369,7 @@ $ lfs df -h
 
 View the current stripe count.
 ```bash
-$ lfs getstripe -d /<mountpath>
+lfs getstripe -d /<mountpath>
 ```
 
 
@@ -382,7 +382,7 @@ The stripe size determines the amount of data stored on each OST per file before
 *Example: Set a stripe count of 4, and stripe size of 1MB on a mount path*
 
 ```bash
-$ lfs setstripe -c 4 -s 1M /<mountpath>
+lfs setstripe -c 4 -s 1M /<mountpath>
 ```
 
 
@@ -416,14 +416,14 @@ In the subsequent testing sections of this PoC guide, we will provide examples t
 2. Install your application load testing tool, or run the below command to install FIO, as part of this PoC deployment.
 
 ```bash
-$ sudo yum -y install fio
+sudo yum -y install fio
 ```
 3. Lets navigate to the path that we mounted the FSx for Lustre file system on the EC2 instance (i.e. /fsx), and create a new directory to host your testing data.
 
 ```bash
-$ sudo su
-$ mkdir /fsx/performance
-$ cd /fsx/performance
+sudo su
+mkdir /fsx/performance
+cd /fsx/performance
 ```
 
 
@@ -434,7 +434,7 @@ The below example fio command will:
 - Generate an IO load pattern with a 50/50 read/write ratio, random read/write pattern with a block size of 1MB, with job runtime duration of 120 seconds.
 
 ```bash
-$ sudo fio --name=fiotest-throughput  --filename=/fsx/performance/mytestfile --direct=1 --rw=randrw  --rwmixread=50 --bs=1MB --size=10GB --ioengine=libaio --iodepth=64  --numjobs=2 --randrepeat=1 --group_reporting --runtime=120 --time_based
+sudo fio --name=fiotest-throughput  --filename=/fsx/performance/mytestfile --direct=1 --rw=randrw  --rwmixread=50 --bs=1MB --size=10GB --ioengine=libaio --iodepth=64  --numjobs=2 --randrepeat=1 --group_reporting --runtime=120 --time_based
 ```
 
 Below is an output of the above example fio test command. At the bottom of the output, you are provided with the ***READ & WRITE*** bandwidth achieved in terms of ***MiB/s*** for the fio command taht was run. The fio output values that you obtain when you run this command will vary based on the configuration of your FSx file system size and striping, EC2 instance type and configuration, and fio load testing parameters selected.
