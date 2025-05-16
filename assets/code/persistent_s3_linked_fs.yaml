@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'CloudFormation template to deploy a PoC VPC with components of: Amazon FSx for Lustre, Amazon S3 and Amazon EC2 '
+Description: 'This CloudFormation template (SO9038) deploys a PoC VPC that includes an S3-Linked Amazon FSx for Lustre file system and an Amazon EC2 instance'
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -124,7 +124,36 @@ Resources:
         - ''
         - - 'pocfsxl-'
           - !Select [2, !Split ["/", !Ref "AWS::StackId"]]
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
 
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: RequireSSLOnlyAccess
+            Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource: 
+              - !Sub '${S3Bucket.Arn}/*'
+              - !GetAtt S3Bucket.Arn
+            Condition:
+              Bool:
+                'aws:SecureTransport': false
   VPC:
     Type: AWS::EC2::VPC
     Properties:
@@ -166,7 +195,7 @@ Resources:
       VpcId: !Ref VPC
       CidrBlock: !Ref PublicSubnetCidr
       AvailabilityZone: !Ref AvailabilityZone
-      MapPublicIpOnLaunch: true
+      MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
           Value: Public-Subnet
@@ -238,26 +267,26 @@ Resources:
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
           FromPort: 988
           ToPort: 988
           CidrIp: !Ref VpcCidr
+          Description: "Port required by FSx"
         - IpProtocol: tcp
           FromPort: 1021
           ToPort: 1023
           CidrIp: !Ref VpcCidr
+          Description: "Port range required by FSx"
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: 0.0.0.0/0
+          CidrIp: 10.0.0.0/16
+          Description: "Allow outbound HTTPS for SSM"
       SecurityGroupEgress:
         - IpProtocol: -1
           FromPort: -1
           ToPort: -1
           CidrIp: 0.0.0.0/0
+          Description: "Outbound access"
       Tags:
         - Key: Name
           Value: FSxLustrePoCSecurityGroup
@@ -281,6 +310,8 @@ Resources:
       Tags:
         - Key: Name
           Value: !Ref FileSystemName
+        - Key: PoCguide
+          Value: FSxLustre
           
   WaitHandle:
     Type: AWS::CloudFormation::WaitConditionHandle
@@ -383,7 +414,7 @@ Resources:
       - SSMMessagesVPCEndpoint
       - EC2MessagesVPCEndpoint
     Properties:
-      InstanceType: c6in.2xlarge
+      InstanceType: c6in.8xlarge
       BlockDeviceMappings:
         - DeviceName: /dev/xvda
           Ebs:
@@ -399,6 +430,8 @@ Resources:
       Tags:
         - Key: Name
           Value: FSx-Lustre-Client
+        - Key: PoCguide
+          Value: FSxLustre
         
 
 Outputs:

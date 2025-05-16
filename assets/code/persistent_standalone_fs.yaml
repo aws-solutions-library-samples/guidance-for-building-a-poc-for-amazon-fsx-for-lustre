@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'CloudFormation template to deploy a PoC VPC with components of: Amazon FSx for Lustre and Amazon EC2 '
+Description: 'This CloudFormation template (SO9038) deploys a PoC VPC that includes an Amazon FSx for Lustre file system and an Amazon EC2 instance'
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -152,7 +152,7 @@ Resources:
       VpcId: !Ref VPC
       CidrBlock: !Ref PublicSubnetCidr
       AvailabilityZone: !Ref AvailabilityZone
-      MapPublicIpOnLaunch: true
+      MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
           Value: Public-Subnet
@@ -224,26 +224,26 @@ Resources:
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
           FromPort: 988
           ToPort: 988
           CidrIp: !Ref VpcCidr
+          Description: "Port required by FSx"
         - IpProtocol: tcp
           FromPort: 1021
           ToPort: 1023
           CidrIp: !Ref VpcCidr
+          Description: "Port range required by FSx"
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: 0.0.0.0/0
+          CidrIp: 10.0.0.0/16
+          Description: "Allow outbound HTTPS for SSM"
       SecurityGroupEgress:
         - IpProtocol: -1
           FromPort: -1
           ToPort: -1
           CidrIp: 0.0.0.0/0
+          Description: "Outbound access"
       Tags:
         - Key: Name
           Value: FSxLustrePoCSecurityGroup
@@ -339,7 +339,7 @@ Resources:
       - SSMMessagesVPCEndpoint
       - EC2MessagesVPCEndpoint
     Properties:
-      InstanceType: c6in.2xlarge
+      InstanceType: c6in.8xlarge
       BlockDeviceMappings:
         - DeviceName: /dev/xvda
           Ebs:
