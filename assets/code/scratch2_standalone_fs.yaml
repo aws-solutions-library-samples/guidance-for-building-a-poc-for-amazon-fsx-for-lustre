@@ -328,7 +328,6 @@ Resources:
       - EC2MessagesVPCEndpoint
     Properties:
       InstanceType: c6in.8xlarge
-      DisableApiTermination: true 
       BlockDeviceMappings:
         - DeviceName: /dev/xvda
           Ebs:
