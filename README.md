@@ -367,7 +367,7 @@ lfs df -h
 <img src="assets/images/lfs.JPG" width="577" height="400" />
 
 
-View the current stripe count.
+View the current stripe count. (i.e. your mountpath would be /fsx in this Guidance)
 ```bash
 lfs getstripe -d /<mountpath>
 ```
@@ -379,7 +379,7 @@ lfs getstripe -d /<mountpath>
 
 The stripe size determines the amount of data stored on each OST per file before moving to the next OST to store the file data. The default value is 1MiB, where setting a stripe offset may be useful in special circumstances, but in general it is best to leave it unspecified and use the default value.
 
-*Example: Set a stripe count of 4, and stripe size of 1MB on a mount path*
+*Example: Set a stripe count of 4, and stripe size of 1MB on a mount path (i.e. your mountpath would be /fsx in this Guidance)* 
 
 ```bash
 lfs setstripe -c 4 -S 1M /<mountpath>
