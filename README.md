@@ -421,8 +421,7 @@ sudo yum -y install fio
 3. Lets navigate to the path that we mounted the FSx for Lustre file system on the EC2 instance (i.e. /fsx), and create a new directory to host your testing data.
 
 ```bash
-sudo su
-mkdir /fsx/performance
+sudo mkdir /fsx/performance
 cd /fsx/performance
 ```
 
