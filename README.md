@@ -382,7 +382,7 @@ The stripe size determines the amount of data stored on each OST per file before
 *Example: Set a stripe count of 4, and stripe size of 1MB on a mount path (i.e. your mountpath would be /fsx in this Guidance)* 
 
 ```bash
-lfs setstripe -c 4 -S 1M /<mountpath>
+sudo lfs setstripe -c 4 -S 1M /<mountpath>
 ```
 
 
