@@ -316,7 +316,13 @@ sudo dnf install -y lustre-client
 ```
 
 
-- Run the commands you copied from the step 1 into the command prompt to create the **/fsx** folder, and then mount the Lustre file system.
+- Run the commands you copied from the step 1 into the command prompt to create first a folder called **/fsx** , and then mount the FSx for Lustre file system on the **/fsx** folder path.
+- Run the below command to view your mounted FSx for Lustre instance on */fsx*
+
+```bash
+df -h
+```
+
 - If you have more than one compute instance, run these commands on each required compute to mount the Lustre file system.
 Review the Post deployment performance tips section below, before copying data to your FSx instance
 
