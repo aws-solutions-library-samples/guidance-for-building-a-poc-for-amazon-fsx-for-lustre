@@ -383,20 +383,17 @@ lfs getstripe -d /<mountpath>
 **Stripe Size**
 
 
-The stripe size determines the amount of data stored on each OST per file before moving to the next OST to store the file data. The default value is 1MiB, where setting a stripe offset may be useful in special circumstances, but in general it is best to leave it unspecified and use the default value.
-
-*Example: Set a stripe count of 4, and stripe size of 1MB on a mount path (i.e. your mountpath would be /fsx in this Guidance)* 
+The stripe size determines the amount of data stored on each OST per file before moving to the next OST to store the file data. The default value is 1MiB, where setting a stripe offset may be useful in special circumstances, but in general it is best to leave it unspecified and use the default value, and the default Progressive file layout (PFL) used by FSx for Lustre. If you do need to change the striping then, you can use the example syntax below. 
 
 ```bash
-sudo lfs setstripe -c 4 -S 1M /<mountpath>
+sudo lfs setstripe -c <value> -S <value> /<mountpath>
 ```
-
 
 Stripe parameters:
 
 ```bash
--c | Stripe count | 0 = use system default, -1 = stripe across all available OSTs
--S | Stripe size | 0 = use default system size, or set to a value using m (for MB) or g (for GB)
+-c | Stripe count | 0 = use system default, -1 = stripe across all available OSTs, or provide your own count value
+-S | Stripe size | 0 = use default system size, or set to a value using M (for MB) or G (for GB) (i.e. 1G for 1GB)
 ```
 
 **Note:** Do not set the stripe count to be greater than your OST count.
