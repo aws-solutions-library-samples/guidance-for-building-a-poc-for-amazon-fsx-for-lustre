@@ -328,12 +328,14 @@ Resources:
       - EC2MessagesVPCEndpoint
     Properties:
       InstanceType: c6in.8xlarge
+      DisableApiTermination: true 
       BlockDeviceMappings:
         - DeviceName: /dev/xvda
           Ebs:
             VolumeSize: 50
             VolumeType: gp3
             DeleteOnTermination: true 
+            Encrypted: true  
       ImageId: !Ref LatestAmiId
       KeyName: !Ref EC2KeyPair
       SubnetId: !Ref PrivateSubnet
