@@ -382,7 +382,7 @@ The stripe size determines the amount of data stored on each OST per file before
 *Example: Set a stripe count of 4, and stripe size of 1MB on a mount path*
 
 ```bash
-lfs setstripe -c 4 -s 1M /<mountpath>
+lfs setstripe -c 4 -S 1M /<mountpath>
 ```
 
 
@@ -390,7 +390,7 @@ Stripe parameters:
 
 ```bash
 -c | Stripe count | 0 = use system default, -1 = stripe across all available OSTs
--s | Stripe size | 0 = use default system size, or set to a value using m (for MB) or g (for GB)
+-S | Stripe size | 0 = use default system size, or set to a value using m (for MB) or g (for GB)
 ```
 
 **Note:** Do not set the stripe count to be greater than your OST count.
