@@ -416,9 +416,9 @@ In the subsequent testing sections of this PoC guide, we will provide examples t
 
 #### Throughput testing
 
-1. Log into the EC2 instance that you installed the Lustre client on to.
+1. Log into the EC2 instance that you mounted the FSx file system on, using the **Session Manager** method show in this Guidance, or your own method.
 
-2. Install your application load testing tool, or run the below command to install FIO, as part of this PoC deployment.
+2. Install your application load testing tool, or run the below command to install **FIO** as part of this PoC deployment.
 
 ```bash
 sudo yum -y install fio
