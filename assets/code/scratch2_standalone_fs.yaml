@@ -223,7 +223,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: 10.0.0.0/16
+          CidrIp: !Ref VpcCidr
           Description: "Allow outbound HTTPS for SSM"
       SecurityGroupEgress:
         - IpProtocol: -1
