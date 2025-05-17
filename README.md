@@ -296,20 +296,21 @@ Each of the sample AWS CloudFormation YAML templates provided in this Guidance w
 
 #### Mounting the FSx for Lustre file system on the deployed EC2 instance
 
-1. Navigate to the **[Amazon FSx console](https://console.aws.amazon.com/fsx)**
+1. Obtain the mount details of the FSx file system 
+- Navigate to the **[Amazon FSx console](https://console.aws.amazon.com/fsx)**
 - Select your FSx for Lustre instance name
-- Click on the **Attach** button
-- Copy the mount commands exactly as shown for this PoC guide as you will use it in Step3. The mount commands will create a directory called "/fsx" and then mount the Lustre file system on "/fsx".
+- Click on the **Attach** button 
+- In the pop-up, you are provided with the exact commands to easily mount the FSx file system on an EC2 instance. Copy the mount commands exactly as shown (into a notepad file) as you will use them in **step 3** below, to mount the FSx file system. The mount commands shown will firstly create a directory called "/fsx", and then mount the Lustre file system on "/fsx".
 
-2. Log into your deployed EC2 instance
+2. Log into your deployed EC2 instance using Session Manager.
 - Navigate to the **[Amazon EC2 console](https://console.aws.amazon.com/ec2)**
 - Select the instance and choose **Connect**.
 - For the connection method, choose **Session Manager**.
 - Choose **Connect** to start the session. The connect button may take a moment to become accessible when you connect to the EC2 instance using Amazon Systems Manager for the very first time.
 - **Note**: You can change the default session timeout value for Session Manager sessions to the EC2 instance by [following these instructions.](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-preferences-max-timeout.html)
 
-3. Once logged into the Amazon EC2 instance:
-- **[Install the Lustre client software](https://docs.aws.amazon.com/fsx/latest/LustreGuide/install-lustre-client.html)** on each compute instance. Use the below command to install it on your Amazon Linux 2023 AMI based EC2 instance:
+3. Install Lustre client on the EC2 instance and mount FSx file system.
+- Use the below command to install the Lustre client on the EC2 Instance that you have logged into (these instructions are for Amazon Linux 2023 OS). To install the Lustre client on different OS types that you might deploy, **[refer to installing Lustre client software](https://docs.aws.amazon.com/fsx/latest/LustreGuide/install-lustre-client.html)**. If you deploy more EC2 Instances for your PoC testing, you will need to install the Lustre client on each EC2 Instance that will access the FSx file system.
 
 ```bash
 sudo dnf install -y lustre-client
