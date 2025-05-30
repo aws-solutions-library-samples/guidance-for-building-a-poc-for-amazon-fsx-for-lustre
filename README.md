@@ -148,11 +148,11 @@ Use an S3-linked FSx for Lustre file systems for scenarios where you need to acc
 
 #### Storage deployment type:
 
-Choose between either a Persistent-SSD, Scratch-SSD, or Persistent-HDD Storage deployment type. For this PoC guide, we are going to focus on Persistent-SSD & Scratch-SSD storage deployment types.
+Choose between either a Persistent-SSD, Scratch-SSD, or Persistent-Intelligent_Tiering Storage deployment types.
 
-Persistent-SSD deployment is recommended for mission-critical, long-running workloads that require the highest level of availability, for example HPC simulations, big data analytics or Machine Learning training.
-
-Scratch-SSD deployments are suitable for workloads that are ephemeral or short-lived.
+- Persistent-SSD storage is recommended for mission-critical, long-running workloads that require the highest level of availability, for example HPC simulations, big data analytics or Machine Learning training.
+- Persistent-Intelligent_Tiering storage is optimized for HDD-based or mixed HDD/SSD workloads that have a mix of hot and cold data and don’t require consistent SSD-level performance, where Intelligent-Tiering automatically scales your file storage up or down based on your access patterns, and you don't need to provision storage upfront.
+- Scratch-SSD storage is suitable for workloads that are ephemeral or short-lived.
 
 #### Storage capacity:
 
