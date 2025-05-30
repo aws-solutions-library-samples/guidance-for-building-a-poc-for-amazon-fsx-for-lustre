@@ -481,7 +481,7 @@ You can use your own values for the fio parameters, based on your actual workloa
 - Select **Update**
 - Monitor the **Updates** tab within the FSx console for update operation to show a completed status, before using the file system for any testing
 
-**Dynamic scaling of provisioned Throughput per-unit of storage (Persistent storage only)**
+**Dynamic scaling of provisioned Throughput per-unit of storage (Persistent-SSD storage only)**
 
 - Navigate to the **[Amazon FSx console](https://console.aws.amazon.com/fsx)**
 - Select your FSx Instance
@@ -490,13 +490,33 @@ You can use your own values for the fio parameters, based on your actual workloa
 - Select **Update**
 - Monitor the **Updates** tab within the FSx console for update operation to show a completed status, before using the file system for any testing
 
-**Dynamic scaling of Metadata IOPS (Persistent storage only)**
+**Dynamic scaling of Metadata IOPS (Available for Persistent-SSD and Persisent-Intelligent Tiering storage)**
 - Navigate to the **[Amazon FSx console](https://console.aws.amazon.com/fsx)**
 - Select your FSx Instance
 - Select **Actions** 🡪 **Update Metadata IOPS**
 - Select between Automatic or User-provisioned Metadata IOPS values
 - Select **Update**
 - Monitor the **Updates** tab within the FSx console for update operation to show a completed status, before using the file system for any testing
+
+**Dynamic scaling of Throughput Capacity (Available for Persistent-Intelligent Tiering storage)**
+
+- Navigate to the **[Amazon FSx console](https://console.aws.amazon.com/fsx)**
+- Select your FSx Instance
+- Select **Actions** 🡪 **Update Throughput Capacity**
+- Increase or decrease Throughput value as required
+- Select **Update**
+- Monitor the **Updates** tab within the FSx console for update operation to show a completed status, before using the file system for any testing
+
+**Dynamic scaling of SSD read cache capacity (Available for Persistent-Intelligent Tiering storage)**
+
+- Navigate to the **[Amazon FSx console](https://console.aws.amazon.com/fsx)**
+- Select your FSx Instance
+- Select **Actions** 🡪 **Update SSD read cache**
+- Change to your required mode and applicable value: AUTOMATIC, CUSTOM, NONE
+- Select **Update**
+- Monitor the **Updates** tab within the FSx console for update operation to show a completed status, before using the file system for any testing
+
+
 
 #### Amazon S3 integration for automatic import and export of data (only for S3-Linked FSx for Lustre file systems)
 Perform the below actions to test the FSx for Lustre & S3 automatic import/export capability.
