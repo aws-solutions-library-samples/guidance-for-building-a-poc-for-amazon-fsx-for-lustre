@@ -31,11 +31,11 @@ Metadata:
       FileSystemName:
         default: "File System Name"
       LustreDeploymentType:
-        default: "Deployment Type"
+        default: "FSx Deployment Type"
       StorageCapacity:
         default: "Storage Capacity (GB)"
       DataCompression:
-        default: "Select the data compression type you want to enable"
+        default: "Data Compression"
       S3ImportedFileChunkSize:
         default: "S3 ImportedFileChunkSize (MiB)"        
 
@@ -290,7 +290,7 @@ Resources:
         - !Ref PrivateSubnet
       SecurityGroupIds: 
         - !Ref FSxLustrePoCSecurityGroup
-      FileSystemTypeVersion: "2.12"
+      FileSystemTypeVersion: "2.15"
       LustreConfiguration:
         DeploymentType: !Ref LustreDeploymentType
         DataCompressionType : !Ref DataCompression

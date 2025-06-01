@@ -16,9 +16,10 @@ Metadata:
         Parameters:
           - FileSystemName
           - LustreDeploymentType
-          - StorageCapacity
-          - PerUnitStorageThroughput
-          - DataCompression 
+          - LustreStorageType          
+          - FSxThroughputCapacity
+          - MetadataIOPS
+          - DataCompression          
           
     ParameterLabels:
       VpcCidr:
@@ -33,12 +34,14 @@ Metadata:
         default: "File System Name"
       LustreDeploymentType:
         default: "Deployment Type"
-      StorageCapacity:
-        default: "Storage Capacity (GB)"
-      PerUnitStorageThroughput:
-        default: "Storage Throughput (MB/s per-TiB)"
+      LustreStorageType:
+        default: "Storage Type"
+      FSxThroughputCapacity:
+        default: "Storage Throughput required (in MB/s)"
+      MetadataIOPS:
+        default: "Metadata IOPS configuration"        
       DataCompression:
-        default: "Data Compression"
+        default: "Data Compression type"
 
      
 
@@ -81,22 +84,31 @@ Parameters:
       - 'PERSISTENT_2'
     Description: FSx for Lustre storage deployment type
 
-  StorageCapacity:
-    Type: Number
-    Default: 1200
-    MinValue: 1200
-    Description: Storage capacity for FSx for Lustre in (allowed values minimum 1200, after that multiples of 2400)
-
-  PerUnitStorageThroughput:
-    Type: Number
-    Default: 125
+  LustreStorageType:
+    Type: String
+    Default: 'INTELLIGENT_TIERING'
     AllowedValues:
-      - 125
-      - 250
-      - 500
-      - 1000 
-    Description: Per-unit storage throughput in MB/s per-TiB storage provisioned       
+      - 'INTELLIGENT_TIERING'    
+    Description: "FSx for Lustre storage type, i.e. INTELLIGENT_TIERING"
 
+  MetadataIOPS:
+    Type: Number
+    Default: 6000
+    AllowedValues:
+      - 6000
+      - 12000
+    Description: "Specify the metadata IOPS you need for your file system. Supported sizes: 6,000 or 12,000 IOPS."
+
+  FSxThroughputCapacity:
+    Type: Number
+    Default: 4000
+    MinValue: 4000
+    MaxValue: 2000000
+    Description: "Increments of 4,000 MB/s with maximum 2,000,000 MB/s."
+
+
+ 
+    
   DataCompression:
     Type: String
     Default: 'LZ4'
@@ -255,7 +267,8 @@ Resources:
     Type: AWS::FSx::FileSystem
     Properties:
       FileSystemType: LUSTRE
-      StorageCapacity: !Ref StorageCapacity
+      StorageType: !Ref LustreStorageType
+
       SubnetIds: 
         - !Ref PrivateSubnet
       SecurityGroupIds: 
@@ -263,9 +276,14 @@ Resources:
       FileSystemTypeVersion: "2.15"
       LustreConfiguration:
         DeploymentType: !Ref LustreDeploymentType
-        PerUnitStorageThroughput: !Ref PerUnitStorageThroughput
+        ThroughputCapacity: !Ref FSxThroughputCapacity
         DataCompressionType : !Ref DataCompression
         WeeklyMaintenanceStartTime: '7:01:00'
+        DataReadCacheConfiguration:
+          SizingMode: PROPORTIONAL_TO_THROUGHPUT_CAPACITY
+        MetadataConfiguration:
+          Mode: USER_PROVISIONED
+          Iops: !Ref MetadataIOPS
       Tags:
         - Key: Name
           Value: !Ref FileSystemName
