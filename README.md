@@ -156,13 +156,13 @@ You can deploy an FSx for Lustre file system in two configurations:
 
 Use an S3-linked FSx for Lustre file systems for scenarios where you need to access large datasets stored in an S3 Bucket for use-cases such as, Machine Learning and training, HPC simulations, and big data analytics.
 
-#### Storage deployment type:
+#### FSx deployment type:
 
-Choose between either a Persistent-SSD, Scratch-SSD, or Persistent-Intelligent_Tiering Storage deployment types.
+You can choose between 3 FSx for Lustre deployment types:
 
-- Persistent-SSD storage is recommended for mission-critical, long-running workloads that require the highest level of availability, for example HPC simulations, big data analytics or Machine Learning training.
-- Persistent-Intelligent_Tiering storage is optimized for HDD-based or mixed HDD/SSD workloads that have a mix of hot and cold data and don’t require consistent SSD-level performance, where Intelligent-Tiering automatically scales your file storage up or down based on your access patterns, and you don't need to provision storage upfront.
-- Scratch-SSD storage is suitable for workloads that are ephemeral or short-lived.
+- **Persistent-SSD storage** - Recommended for mission-critical, long-running workloads that require the highest level of availability, for example HPC simulations, big data analytics or Machine Learning training.
+- **Persistent-Intelligent_Tiering storage** - Optimized for HDD-based or mixed HDD/SSD workloads that have a mix of hot and cold data and don’t require consistent SSD-level performance, where Intelligent-Tiering automatically scales your file storage up or down based on your access patterns, and you don't need to provision storage upfront.
+- **Scratch-SSD storage** - Suitable for workloads that are ephemeral or short-lived.
 
 #### Storage capacity:
 
