@@ -27,7 +27,17 @@ Amazon FSx for Lustre is a fully managed file system that is optimized for high-
 
 Amazon FSx eliminates the traditional complexity of setting up and managing high-performance Lustre file systems, allowing you to spin up, run, and scale a high-performance file system that provides sub-millisecond access to data stored in the Lustre file system, in minutes. FSx for Lustre also provides multiple deployment options for cost optimization. Amazon FSx for Lustre also integrates with Amazon S3, making it easy to process cloud data sets with the Lustre high-performance file system. When linked to an S3 bucket, an FSx for Lustre file system transparently presents S3 objects as files and can automatically update the contents of the linked S3 bucket as files are added to, changed in, or deleted from the file system.
 
+This diagram illustrates the Guidance’s architecture, how it's deployed, key components & their interactions, with a step-by-step flow.
+
 <img src="assets/images/architecture.JPG" width="720" height="420" />
+
+The diagram above highlights the following:
+1. The user logs into the AWS Management Console, and deploys the Proof-of-Concept (PoC) template provided in this Guidance, using AWS CloudFormation to create a new stack.
+2. AWS CloudFormation deploys an Amazon VPC.
+3. AWS CloudFormation deploys an Amazon EC2 compute node. This compute node will be used as part of this Guidance to conduct performance, functional and integration testing with the deployed Amazon FSx for Lustre file system.
+4. AWS CloudFormation configures the Amazon EC2 instance with AWS Systems Manager, allowing for Session Manager to be utilized for secure CLI access to the Amazon EC2 instance.
+5. AWS CloudFormation deploys an Amazon FSx for Lustre file system.
+6. Optional: AWS CloudFormation creates an Amazon S3 bucket and an FSx for Lustre file system configuration, to link the S3 bucket as a Data Repository for automatic import & export of data.
 
 <br/><br/>
 
@@ -263,14 +273,17 @@ aws iam simulate-principal-policy --policy-source-arn $MYARN --action-names "s3:
 
 #### Deploying a FSx for Lustre file system in a new PoC VPC environment using CloudFormation
 
-To get started and deploy this PoC Guidance, use AWS CloudFormation to deploy one of the below CloudFormation templates (YAML files) based on your required FSx for Lustre file system deployment type (i.e. Persistent-SSD or Scratch), and whether you require a standalone FSx file system, or an S3-linked FSx file system.
+To get started and deploy this PoC Guidance, use AWS CloudFormation to deploy one of the below CloudFormation templates (YAML files) based on your required FSx for Lustre file system deployment type (i.e. Persistent-SSD or Scratch deployment), and whether you require a standalone or an S3-linked FSx for Lustre file system. 
 
-| FSx file system type| File system mode : Standalone or S3-linked | CloudFormation template |
+| FSx file system deployment type| File system mode : Standalone or S3-linked | CloudFormation template |
 | ----------- | ------------ | ------------ | 
 | Persistent-SSD | Standalone FSx for Lustre file system  |  [Persistent2_standalone_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/persistent_standalone_fs.yaml) |
 | Persistent-SSD | S3-Linked FSx for Lustre file system | [Persistent2_s3_linked_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/persistent_s3_linked_fs.yaml) |
-| Scratch | Standalone FSx for Lustre file system  | [scratch2_standalone_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/scratch2_standalone_fs.yaml) |
-| Scratch | S3-Linked FSx for Lustre file system | [scratch2_s3_linked_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/scratch2_s3_linked_fs.yaml) | 
+| Scratch | Standalone FSx for Lustre file system  | [Scratch2_standalone_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/scratch2_standalone_fs.yaml) |
+| Scratch | S3-Linked FSx for Lustre file system | [Scratch2_s3_linked_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/scratch2_s3_linked_fs.yaml) | 
+| Persistent-INTELLIGENT_TIERING | N/A | [Persistent_Intelligent_Tiering_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-building-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/persistent_intelligent_tiering_fs.yml) |
+
+Once you open one of the above FSx PoC environment templates in the AWS CloudFormation console, input values for the parameters shown in the CloudFormation template, and select to deploy the template.
 
 Each of the sample AWS CloudFormation YAML templates provided in this Guidance will deploy the following:
 
