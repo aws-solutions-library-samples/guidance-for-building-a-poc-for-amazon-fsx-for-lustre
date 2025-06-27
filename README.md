@@ -58,8 +58,8 @@ The cost breakdown is provided as below, where you values will differ based on t
 
 | AWS service  | Dimensions | Example sizing |  Example cost per-hour [USD]  |  Example cost per-month [USD]  |
 | ----------- | ------------ | ------------ | ------------  | ------------  |
-| Amazon FSx for Lustre  | $0.140 per GB-month for SCRATCH-SSD file system | 9,600 GiB  | $ 1.87 per-hour | $ 1,345.54 per-month | 
-| Amazon EC2 | $1.8144 per-hour for c6in.8xlarge instance | Single c6in.8xlarge instance | $ $1.8144 per-hour | $ 1,324.51 per-month |
+| Amazon FSx for Lustre  | $0.140 per GB-month for SCRATCH-SSD file system | 9,600 GiB  | $1.87 per-hour | $1,345.54 per-month | 
+| Amazon EC2 | $1.82 per-hour for c6in.8xlarge instance | Single c6in.8xlarge instance | $1.82 per-hour | $1,324.51 per-month |
 
 <br/><br/>
 
