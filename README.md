@@ -53,7 +53,10 @@ _We recommend creating a [Budget](https://docs.aws.amazon.com/cost-management/l
 
 ### Sample Cost Table
 
-The cost to run this guidance is based on the **configuration of your FSx for Lustre** file system, and also the **EC2 instance** that you select. As an example, if you deploy this Guidance with its default **c6in.8xlarge** EC2 Instance type, and also choose to deploy a **9600GiB** FSx for Lustre SCRATCH-SSD based file system (which provides **1920 MB/s Throughput Capacity**) in the US-East (N. Virginia) region, as of April 2025 the cost to run this Guidance is approximately **$3.71 USD per-hour** or **$2,670.08 USD per-month**. 
+The cost to run this guidance is based on the **configuration of your FSx for Lustre** file system, and also the **EC2 instance** that you select. 
+
+As an example, if you deploy this Guidance with its default **c6in.8xlarge** EC2 Instance type, and also choose to deploy a **9600GiB** FSx for Lustre SCRATCH-SSD based file system (which provides **1920 MB/s Throughput Capacity**) in the US-East (N. Virginia) region, as of April 2025 the cost to run this PoC Guidance is approximately <ins>***$3.71 USD per-hour***</ins>, or $2,670.08 USD per-month. 
+
 The cost breakdown is provided as below, where you values will differ based on the type and size of the EC2 instance and FSx file system you deploy.
 
 | AWS service  | Dimensions | Example sizing |  Example cost per-hour [USD]  |  Example cost per-month [USD]  |
