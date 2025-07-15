@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'This CloudFormation template (SO9038) deploys a PoC VPC that includes an S3-Linked Amazon FSx for Lustre file system and an Amazon EC2 instance'
+Description: 'This CloudFormation template (SO9038) deploys a PoC VPC that includes an S3-Linked Amazon FSx for Lustre PERSISTENT-SSD file system and an Amazon EC2 instance'
 
 Metadata:
   AWS::CloudFormation::Interface:
