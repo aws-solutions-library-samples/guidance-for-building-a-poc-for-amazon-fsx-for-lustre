@@ -278,7 +278,7 @@ aws iam simulate-principal-policy --policy-source-arn $MYARN --action-names "s3:
 
 To get started and deploy this PoC Guidance, use AWS CloudFormation to deploy one of the below CloudFormation templates (YAML files) based on your required FSx for Lustre file system deployment type (i.e. Persistent-SSD or Scratch deployment), and whether you require a standalone or an S3-linked FSx for Lustre file system. 
 
-| FSx file system deployment type| File system mode : Standalone or S3-linked | CloudFormation template |
+| FSx for Lustre deployment type| File system mode : Standalone or S3-linked | CloudFormation template |
 | ----------- | ------------ | ------------ | 
 | Persistent-SSD | Standalone FSx for Lustre file system  |  [Persistent2_standalone_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/persistent_standalone_fs.yaml) |
 | Persistent-SSD | S3-Linked FSx for Lustre file system | [Persistent2_s3_linked_fs.yaml](https://github.com/aws-solutions-library-samples/guidance-for-deploying-a-poc-for-amazon-fsx-for-lustre/blob/main/assets/code/persistent_s3_linked_fs.yaml) |
