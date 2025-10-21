@@ -318,7 +318,7 @@ Each of the sample AWS CloudFormation YAML templates provided in this Guidance w
   - Click on the **Attach** button 
   - In the pop-up, under the "Attach instruction - using the default DNS name" section, you are provided with the exact commands to easily mount the FSx file system on an EC2 instance. Copy these mount commands exactly as shown into a notepad file, as you will use them in **step 3** below to mount the FSx file system. The mount commands shown will firstly create a directory called "/fsx", and then mount the Lustre file system on "/fsx".
 
-    <img src="assets/images/fsxl_attach.png" />
+    <img src="assets/images/fsxl_attach.png" width="380" height="300" />
 
 2. Log into your deployed EC2 instance using Session Manager.
 - Navigate to the **[Amazon EC2 console](https://console.aws.amazon.com/ec2)**
